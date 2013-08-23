@@ -40,3 +40,6 @@ nosetests.xml
 *.pot
 *.pyc
 local_settings.py
+
+/candideitorg-for-testing/
+start-local-candideitorg.sh
