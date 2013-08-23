@@ -6,56 +6,60 @@ Replace this with more appropriate tests for your application.
 """
 
 from django.test import TestCase
-from candideitorg.models import CandideitorgDocument
+from candideitorg.models import CandideitorgDocument, Election
 from django.core.management import call_command
 
 class CandideitorgDocumentTest(TestCase):
     
     def setUp(self):
-    	super(CandideitorgDocumentTest, self).setUp()
+        super(CandideitorgDocumentTest, self).setUp()
 
     def test_candideitor_document_is_abstract(self):
-    	document = CandideitorgDocument()
-    	
-    	self.assertTrue(document)
-    	self.assertTrue(document._meta.abstract)
+        document = CandideitorgDocument()
+        
+        self.assertTrue(document)
+        self.assertTrue(document._meta.abstract)
 
     def test_candideitorg_document_attribute(self):
 
-    	class Element(CandideitorgDocument):
-    		class Meta:
-    			app_label = 'candideitorg'
-    	
-    	call_command('syncdb', verbosity=0)
+        class Element(CandideitorgDocument):
+            class Meta:
+                app_label = 'candideitorg'
+        
+        call_command('syncdb', verbosity=0)
 
-    	
-    	element = Element.objects.create(resource_uri="cualquiercosa", remote_id=2)
+        
+        element = Element.objects.create(resource_uri="cualquiercosa", remote_id=2)
 
-    	self.assertEquals(element.resource_uri,'cualquiercosa')
-    	self.assertEquals(element.remote_id,2)
+        self.assertEquals(element.resource_uri,'cualquiercosa')
+        self.assertEquals(element.remote_id,2)
 
 class ElectionTest(TestCase):
-	def setUp(self):
-    	super(ElectionTest, self).setUp()
+    def setUp(self):
+        super(ElectionTest, self).setUp()
+
+    def test_is_subclass(self):
+        election = Election.objects.create(remote_id=2)
+        self.assertIsInstance(election,CandideitorgDocument)
 
     def test_create_election(self):
-    	election = Election.objects.create(
-    		description: "Elecciones CEI 2012",
-    		remote_id: 1,
-    		information_source: "",
-    		logo: "/media/photos/dummy.jpg",
-    		name: "cei 2012",
-    		resource_uri: "/api/v2/election/1/",
-    		slug: "cei-2012",
-    		use_default_media_naranja_option: True
-    		)
+        election = Election.objects.create(
+            description = "Elecciones CEI 2012",
+            remote_id = 1,
+            information_source = "",
+            logo = "/media/photos/dummy.jpg",
+            name = "cei 2012",
+            resource_uri = "/api/v2/election/1/",
+            slug = "cei-2012",
+            use_default_media_naranja_option = True
+            )
 
-    	self.assertTrue(election)
-    	self.assertEquals(election.description, 'Elecciones CEI 2012')
-    	self.assertEquals(election.remote_id, 1)
-    	self.assertEquals(election.information_source, '')
-    	self.assertEquals(election.logo, '/media/photos/dummy.jpg')
-    	self.assertEquals(election.name, 'cei 2012')
-    	self.assertEquals(election.resource_uri, '/api/v2/election/1/')
-    	self.assertEquals(election.slug, 'cei-2012')
-    	self.assertTrue(election.use_default_media_naranja_option)
+        self.assertTrue(election)
+        self.assertEquals(election.description, 'Elecciones CEI 2012')
+        self.assertEquals(election.remote_id, 1)
+        self.assertEquals(election.information_source, '')
+        self.assertEquals(election.logo, '/media/photos/dummy.jpg')
+        self.assertEquals(election.name, 'cei 2012')
+        self.assertEquals(election.resource_uri, '/api/v2/election/1/')
+        self.assertEquals(election.slug, 'cei-2012')
+        self.assertTrue(election.use_default_media_naranja_option)
