@@ -34,4 +34,28 @@ class CandideitorgDocumentTest(TestCase):
     	self.assertEquals(element.resource_uri,'cualquiercosa')
     	self.assertEquals(element.remote_id,2)
 
-    	
+class ElectionTest(TestCase):
+	def setUp(self):
+    	super(ElectionTest, self).setUp()
+
+    def test_create_election(self):
+    	election = Election.objects.create(
+    		description: "Elecciones CEI 2012",
+    		remote_id: 1,
+    		information_source: "",
+    		logo: "/media/photos/dummy.jpg",
+    		name: "cei 2012",
+    		resource_uri: "/api/v2/election/1/",
+    		slug: "cei-2012",
+    		use_default_media_naranja_option: True
+    		)
+
+    	self.assertTrue(election)
+    	self.assertEquals(election.description, 'Elecciones CEI 2012')
+    	self.assertEquals(election.remote_id, 1)
+    	self.assertEquals(election.information_source, '')
+    	self.assertEquals(election.logo, '/media/photos/dummy.jpg')
+    	self.assertEquals(election.name, 'cei 2012')
+    	self.assertEquals(election.resource_uri, '/api/v2/election/1/')
+    	self.assertEquals(election.slug, 'cei-2012')
+    	self.assertTrue(election.use_default_media_naranja_option)
