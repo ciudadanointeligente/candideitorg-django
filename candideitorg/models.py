@@ -48,9 +48,31 @@ class Election(CandideitorgDocument):
                     remote_id=category_dict['id'],
                     election=election
                 )
+            for candidate_uri in election_dict['candidates']:
+                kwargs = {}
+                for key, value in api._store.iteritems():
+                    kwargs[key] = value
+                kwargs.update({"base_url": url_join(api._store["base_url"], candidate_uri)})
+                resource = Resource(**kwargs)
+                candidate_dict = resource.get()
+                Candidate.objects.create(
+                    name=candidate_dict['name'],
+                    election=election,
+                    slug=candidate_dict['slug'],
+                    remote_id=candidate_dict['id'],
+                    photo=candidate_dict['photo'],
+                )
+
 
 class Category(CandideitorgDocument):
     name = models.CharField(max_length=255)
     order = models.IntegerField()
     election = models.ForeignKey(Election)
-    slug = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255)
+
+class Candidate(CandideitorgDocument):
+    photo = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255)
+    has_answered = models.BooleanField()
+    election = models.ForeignKey(Election)

@@ -6,7 +6,7 @@ Replace this with more appropriate tests for your application.
 """
 
 from django.test import TestCase
-from candideitorg.models import CandideitorgDocument, Election, Category
+from candideitorg.models import CandideitorgDocument, Election, Category, Candidate
 from django.core.management import call_command
 from django.utils.unittest import skip
 
@@ -126,12 +126,10 @@ class CategoryTest(TestCase):
         self.assertEquals(categorie.slug,'politicas-publicas')
         self.assertEquals(categorie.election, election)
 
-class Candidates(TestCase):
+class CandidatesTest(TestCase):
     def setUp(self):
-        super(CategoryTest, self).setUp()
-
-    def test_create_candidate(self):
-        election = Election.objects.create(
+        super(CandidatesTest, self).setUp()
+        self.election = Election.objects.create(
             description = "Elecciones CEI 2012",
             remote_id = 1,
             information_source = "",
@@ -141,5 +139,35 @@ class Candidates(TestCase):
             slug = "cei-2012",
             use_default_media_naranja_option = True
             )
+
+    def test_create_candidate(self):
         candidate = Candidate.objects.create(
+            name = "Juanito Perez",
+            photo = "/media/photos/dummy.jpg",
+            slug = "juanito-perez",
+            has_answered = True,
+            election = self.election,
+            remote_id = 1
             )
+
+        self.assertTrue(candidate)
+        self.assertIsInstance(candidate, CandideitorgDocument)
+        self.assertEquals(candidate.name, 'Juanito Perez')
+        self.assertEquals(candidate.photo, '/media/photos/dummy.jpg')
+        self.assertEquals(candidate.slug, 'juanito-perez')
+        self.assertTrue(candidate.has_answered)
+        self.assertEquals(candidate.election, self.election)
+
+    def test_fetch_all_candidates_from_api(self):
+        self.election.delete()
+        Election.fetch_all_from_api()
+        election = Election.objects.all()[0]
+
+        self.assertEquals(Candidate.objects.count(), 3)
+
+        candidate = Candidate.objects.all()[0]
+        self.assertEquals(candidate.remote_id,1)
+        self.assertEquals(candidate.name, 'Juanito Perez')
+        self.assertEquals(candidate.slug, 'juanito-perez')
+        self.assertEquals(candidate.photo, '/media/photos/dummy.jpg')
+        self.assertEquals(candidate.election, election)
