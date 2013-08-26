@@ -33,5 +33,8 @@ class Election(CandideitorgDocument):
                 use_default_media_naranja_option=election_dict["use_default_media_naranja_option"],
                 )
 
-class Category(object):
-    pass
+class Category(CandideitorgDocument):
+    name = models.CharField(max_length=255)
+    order = models.IntegerField()
+    election = models.ForeignKey(Election)
+    slug = models.CharField(max_length=255)

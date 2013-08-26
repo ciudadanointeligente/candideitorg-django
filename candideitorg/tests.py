@@ -84,7 +84,6 @@ class CategoryTest(TestCase):
     def setUp(self):
         super(CategoryTest, self).setUp()
 
-    @skip("Not ready yet")
     def test_create_category(self):
         election = Election.objects.create(
             description = "Elecciones CEI 2012",
@@ -101,11 +100,14 @@ class CategoryTest(TestCase):
             name='category name',
             election=election,
             slug='category-name',
-            order=1
+            order=1,
+            resource_uri='/api/v2/category/1/',
+            remote_id=1
             )
 
         self.assertTrue(category)
+        self.assertIsInstance(category, CandideitorgDocument)
         self.assertEquals(category.name, 'category name')
-        self.assertEquals(category.election, 'election')
+        self.assertEquals(category.election, election)
         self.assertEquals(category.slug, 'category-name')
         self.assertEquals(category.order, 1)
