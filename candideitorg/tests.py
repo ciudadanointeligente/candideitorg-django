@@ -125,3 +125,21 @@ class CategoryTest(TestCase):
         self.assertEqual(categorie.resource_uri,'/api/v2/category/1/')
         self.assertEquals(categorie.slug,'politicas-publicas')
         self.assertEquals(categorie.election, election)
+
+class Candidates(TestCase):
+    def setUp(self):
+        super(CategoryTest, self).setUp()
+
+    def test_create_candidate(self):
+        election = Election.objects.create(
+            description = "Elecciones CEI 2012",
+            remote_id = 1,
+            information_source = "",
+            logo = "/media/photos/dummy.jpg",
+            name = "cei 2012",
+            resource_uri = "/api/v2/election/1/",
+            slug = "cei-2012",
+            use_default_media_naranja_option = True
+            )
+        candidate = Candidate.objects.create(
+            )
