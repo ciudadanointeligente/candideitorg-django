@@ -111,3 +111,17 @@ class CategoryTest(TestCase):
         self.assertEquals(category.election, election)
         self.assertEquals(category.slug, 'category-name')
         self.assertEquals(category.order, 1)
+
+    def test_fetch_all_categories(self):
+        Election.fetch_all_from_api()
+        election = Election.objects.all()[0]
+
+        self.assertEquals(Category.objects.count(), 2)
+
+        categorie = Category.objects.all()[0]
+        self.assertEqual(categorie.remote_id,1)
+        self.assertEqual(categorie.name,'Politicas Publicas')
+        self.assertEqual(categorie.order,1)
+        self.assertEqual(categorie.resource_uri,'/api/v2/category/1/')
+        self.assertEquals(categorie.slug,'politicas-publicas')
+        self.assertEquals(categorie.election, election)
