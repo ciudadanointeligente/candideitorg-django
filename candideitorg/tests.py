@@ -6,7 +6,7 @@ Replace this with more appropriate tests for your application.
 """
 
 from django.test import TestCase
-from candideitorg.models import CandideitorgDocument, Election, Category, Candidate
+from candideitorg.models import CandideitorgDocument, Election, Category, Candidate, BackgroundCategory
 from django.core.management import call_command
 from django.utils.unittest import skip
 
@@ -174,7 +174,7 @@ class CandidatesTest(TestCase):
 
 class BackgroundCategoriesTest(TestCase):
     def setUp(self):
-        super(CategoryTest, self).setUp()
+        super(BackgroundCategoriesTest, self).setUp()
         self.election = Election.objects.create(
             description = "Elecciones CEI 2012",
             remote_id = 1,
@@ -187,8 +187,26 @@ class BackgroundCategoriesTest(TestCase):
             )
 
     def test_create_background_categorie(self):
-        bg_categorie = BackgroundCategorie.objects.create(
+        bg_categorie = BackgroundCategory.objects.create(
             name = 'Tendencia Politica',
             resource_uri = "/api/v2/background_category/1/",
-            election=self.election
+            election=self.election,
+            remote_id=1,
             )
+
+        self.assertTrue(bg_categorie)
+        self.assertIsInstance(bg_categorie, CandideitorgDocument)
+        self.assertEquals(bg_categorie.name, 'Tendencia Politica')
+        self.assertEquals(bg_categorie.election, self.election)
+
+    def test_fetch_all_background_candidates_from_api(self):
+        self.election.delete()
+        Election.fetch_all_from_api()
+        election = Election.objects.all()[0]
+
+        self.assertEquals(BackgroundCategory.objects.count(),2)
+
+        bg_categorie = BackgroundCategory.objects.all()[0]
+        self.assertEquals(bg_categorie.remote_id,1)
+        self.assertEquals(bg_categorie.name,'Tendencia Politica')
+        self.assertEquals(bg_categorie.election,election)

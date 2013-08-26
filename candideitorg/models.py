@@ -62,6 +62,18 @@ class Election(CandideitorgDocument):
                     remote_id=candidate_dict['id'],
                     photo=candidate_dict['photo'],
                 )
+            for background_candidate_uri in election_dict['background_categories']:
+                kwargs = {}
+                for key, value in api._store.iteritems():
+                    kwargs[key] = value
+                kwargs.update({"base_url": url_join(api._store["base_url"], background_candidate_uri)})
+                resource = Resource(**kwargs)
+                background_candidate_dict = resource.get()
+                BackgroundCategory.objects.create(
+                    name=background_candidate_dict['name'],
+                    election=election,
+                    remote_id=background_candidate_dict['id']
+                    )
 
 
 class Category(CandideitorgDocument):
@@ -76,3 +88,7 @@ class Candidate(CandideitorgDocument):
     slug = models.SlugField(max_length=255)
     has_answered = models.BooleanField()
     election = models.ForeignKey(Election)
+
+class BackgroundCategory(CandideitorgDocument):
+    election = models.ForeignKey(Election)
+    name = models.CharField(max_length=255)
