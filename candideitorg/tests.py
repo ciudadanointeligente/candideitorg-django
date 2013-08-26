@@ -171,3 +171,24 @@ class CandidatesTest(TestCase):
         self.assertEquals(candidate.slug, 'juanito-perez')
         self.assertEquals(candidate.photo, '/media/photos/dummy.jpg')
         self.assertEquals(candidate.election, election)
+
+class BackgroundCategoriesTest(TestCase):
+    def setUp(self):
+        super(CategoryTest, self).setUp()
+        self.election = Election.objects.create(
+            description = "Elecciones CEI 2012",
+            remote_id = 1,
+            information_source = "",
+            logo = "/media/photos/dummy.jpg",
+            name = "cei 2012",
+            resource_uri = "/api/v2/election/1/",
+            slug = "cei-2012",
+            use_default_media_naranja_option = True
+            )
+
+    def test_create_background_categorie(self):
+        bg_categorie = BackgroundCategorie.objects.create(
+            name = 'Tendencia Politica',
+            resource_uri = "/api/v2/background_category/1/",
+            election=self.election
+            )
