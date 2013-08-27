@@ -74,6 +74,18 @@ class Election(CandideitorgDocument):
                     election=election,
                     remote_id=background_candidate_dict['id']
                     )
+            for personal_data_uri in election_dict['personal_data']:
+                kwargs = {}
+                for key, value in api._store.iteritems():
+                    kwargs[key] = value
+                kwargs.update({"base_url": url_join(api._store['base_url'], personal_data_uri)})
+                resource = Resource(**kwargs)
+                personal_data_dict = resource.get()
+                PersonalData.objects.create(
+                    label=personal_data_dict['label'],
+                    remote_id = personal_data_dict['id'],
+                    election = election
+                    )
 
 
 class Category(CandideitorgDocument):
@@ -92,3 +104,7 @@ class Candidate(CandideitorgDocument):
 class BackgroundCategory(CandideitorgDocument):
     election = models.ForeignKey(Election)
     name = models.CharField(max_length=255)
+
+class PersonalData(CandideitorgDocument):
+    label = models.CharField(max_length=255)
+    election = models.ForeignKey(Election)

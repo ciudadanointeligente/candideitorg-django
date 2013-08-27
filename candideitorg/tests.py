@@ -6,7 +6,8 @@ Replace this with more appropriate tests for your application.
 """
 
 from django.test import TestCase
-from candideitorg.models import CandideitorgDocument, Election, Category, Candidate, BackgroundCategory
+from candideitorg.models import CandideitorgDocument, Election, Category, Candidate, BackgroundCategory,\
+                                PersonalData
 from django.core.management import call_command
 from django.utils.unittest import skip
 
@@ -210,3 +211,41 @@ class BackgroundCategoriesTest(TestCase):
         self.assertEquals(bg_categorie.remote_id,1)
         self.assertEquals(bg_categorie.name,'Tendencia Politica')
         self.assertEquals(bg_categorie.election,election)
+
+class PersonalDataTest(TestCase):
+    def setUp(self):
+        super(PersonalDataTest, self).setUp()
+        self.election = Election.objects.create(
+            description = "Elecciones CEI 2012",
+            remote_id = 1,
+            information_source = "",
+            logo = "/media/photos/dummy.jpg",
+            name = "cei 2012",
+            resource_uri = "/api/v2/election/1/",
+            slug = "cei-2012",
+            use_default_media_naranja_option = True
+            )
+
+    def test_create_personaldata(self):
+
+        personaldata = PersonalData.objects.create(
+            label = 'Nacimiento',
+            remote_id = 1,
+            election = self.election
+            )
+
+        self.assertTrue(personaldata)
+        self.assertIsInstance(personaldata, CandideitorgDocument)
+        self.assertEquals(personaldata.label,'Nacimiento')
+        self.assertEquals(personaldata.election, self.election)
+
+    def test_fetch_all_personaldata_from_api(self):
+        self.election.delete()
+        Election.fetch_all_from_api()
+        election = Election.objects.all()[0]
+
+        self.assertEquals(PersonalData.objects.count(),4)
+
+        personal_data = PersonalData.objects.all()[0]
+        self.assertEquals(personal_data.label,'Nacimiento')
+        self.assertEquals(personal_data.election, election)
