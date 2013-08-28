@@ -8,8 +8,42 @@ class CandideitorgDocument(models.Model):
     remote_id = models.IntegerField()
     resource_uri = models.CharField(max_length=255)
 
+    @classmethod
+    def get_api(cls):
+        api = slumber.API("http://127.0.0.1:8000/api/v2/", auth=ApiKeyAuth("admin", "a"))
+        return api
+
     class Meta:
 	   abstract = True
+
+    @classmethod
+    def get_resource_as_dict(cls, uri):
+        kwargs = {}
+        api = CandideitorgDocument.get_api()
+        for key, value in api._store.iteritems():
+            kwargs[key] = value
+        kwargs.update({"base_url": url_join(api._store["base_url"], uri)})
+        resource = Resource(**kwargs)
+        dicti = resource.get()
+        return dicti
+
+    @classmethod
+    def create_new_from_dict(cls, dicti, **kwargs):
+        field_names = []
+
+        for field in  iter(cls._meta.fields):
+            field_names.append(field.name)
+
+        new_element = {}
+        for key in dicti.keys():
+            if not isinstance(dicti[key], (list, tuple)):
+                if key in field_names and key != "id":
+                    new_element[key]= dicti[key]
+        new_element["remote_id"] = dicti["id"]
+        new_element.update(kwargs)
+        return cls.objects.create(**new_element)
+
+
 
 class Election(CandideitorgDocument):
     information_source = models.TextField()
@@ -21,71 +55,25 @@ class Election(CandideitorgDocument):
 
     @classmethod
     def fetch_all_from_api(cls):
-        api = slumber.API("http://127.0.0.1:8000/api/v2/", auth=ApiKeyAuth("admin", "a"))
+        api = cls.get_api()
         elections_from_api = api.election.get()
         for election_dict in elections_from_api["objects"]:
-            election = Election.objects.create(
-                name=election_dict["name"],
-                remote_id=election_dict["id"],
-                description=election_dict["description"],
-                logo=election_dict["logo"],
-                resource_uri=election_dict["resource_uri"],
-                slug=election_dict["slug"],
-                use_default_media_naranja_option=election_dict["use_default_media_naranja_option"],
-                )
-            for category_uri in election_dict['categories']:
-                kwargs = {}
-                for key, value in api._store.iteritems():
-                    kwargs[key] = value
-                kwargs.update({"base_url": url_join(api._store["base_url"], category_uri)})
-                resource = Resource(**kwargs)
-                category_dict = resource.get()
-                Category.objects.create(
-                    name=category_dict['name'],
-                    order=category_dict['order'],
-                    resource_uri=category_dict['resource_uri'],
-                    slug=category_dict['slug'],
-                    remote_id=category_dict['id'],
-                    election=election
-                )
-            for candidate_uri in election_dict['candidates']:
-                kwargs = {}
-                for key, value in api._store.iteritems():
-                    kwargs[key] = value
-                kwargs.update({"base_url": url_join(api._store["base_url"], candidate_uri)})
-                resource = Resource(**kwargs)
-                candidate_dict = resource.get()
-                Candidate.objects.create(
-                    name=candidate_dict['name'],
-                    election=election,
-                    slug=candidate_dict['slug'],
-                    remote_id=candidate_dict['id'],
-                    photo=candidate_dict['photo'],
-                )
-            for background_candidate_uri in election_dict['background_categories']:
-                kwargs = {}
-                for key, value in api._store.iteritems():
-                    kwargs[key] = value
-                kwargs.update({"base_url": url_join(api._store["base_url"], background_candidate_uri)})
-                resource = Resource(**kwargs)
-                background_candidate_dict = resource.get()
-                BackgroundCategory.objects.create(
-                    name=background_candidate_dict['name'],
-                    election=election,
-                    remote_id=background_candidate_dict['id']
-                    )
-            for personal_data_uri in election_dict['personal_data']:
-                kwargs = {}
-                for key, value in api._store.iteritems():
-                    kwargs[key] = value
-                kwargs.update({"base_url": url_join(api._store['base_url'], personal_data_uri)})
-                resource = Resource(**kwargs)
-                personal_data_dict = resource.get()
-                PersonalData.objects.create(
-                    label=personal_data_dict['label'],
-                    remote_id = personal_data_dict['id'],
-                    election = election
-                    )
+            election = Election.create_new_from_dict(election_dict)
+            for uri in election_dict['categories']:
+                dictionary = CandideitorgDocument.get_resource_as_dict(uri)
+                Category.create_new_from_dict(dictionary, election=election)
+            for uri in election_dict['candidates']:
+                dictionary = CandideitorgDocument.get_resource_as_dict(uri)
+                Candidate.create_new_from_dict(dictionary, election=election)
+            for uri in election_dict['background_categories']:
+                dictionary = CandideitorgDocument.get_resource_as_dict(uri)
+                backgroundcategory = BackgroundCategory.create_new_from_dict(dictionary, election=election)
+                for uri in dictionary['background']:
+                    dictionary = CandideitorgDocument.get_resource_as_dict(uri)
+                    Background.create_new_from_dict(dictionary, background_category=backgroundcategory)
+            for uri in election_dict['personal_data']:
+                dictionary = CandideitorgDocument.get_resource_as_dict(uri)
+                PersonalData.create_new_from_dict(dictionary, election=election)
 
 
 class Category(CandideitorgDocument):
@@ -108,3 +96,7 @@ class BackgroundCategory(CandideitorgDocument):
 class PersonalData(CandideitorgDocument):
     label = models.CharField(max_length=255)
     election = models.ForeignKey(Election)
+
+class Background(CandideitorgDocument):
+    name = models.CharField(max_length=255)
+    background_category = models.ForeignKey(BackgroundCategory)

@@ -6,8 +6,9 @@ Replace this with more appropriate tests for your application.
 """
 
 from django.test import TestCase
+import slumber
 from candideitorg.models import CandideitorgDocument, Election, Category, Candidate, BackgroundCategory,\
-                                PersonalData
+                                PersonalData, Background
 from django.core.management import call_command
 from django.utils.unittest import skip
 
@@ -35,6 +36,14 @@ class CandideitorgDocumentTest(TestCase):
 
         self.assertEquals(element.resource_uri,'cualquiercosa')
         self.assertEquals(element.remote_id,2)
+
+    def test_get_api(self):
+        class Element(CandideitorgDocument):
+            class Meta:
+                app_label = 'candideitorg'
+
+        api = Element.get_api()
+        self.assertIsInstance(api, slumber.API)
 
 class ElectionTest(TestCase):
     def setUp(self):
@@ -249,3 +258,49 @@ class PersonalDataTest(TestCase):
         personal_data = PersonalData.objects.all()[0]
         self.assertEquals(personal_data.label,'Nacimiento')
         self.assertEquals(personal_data.election, election)
+
+class BackgroundTest(TestCase):
+    def setUp(self):
+        super(BackgroundTest, self).setUp()
+        self.election = Election.objects.create(
+            description = "Elecciones CEI 2012",
+            remote_id = 1,
+            information_source = "",
+            logo = "/media/photos/dummy.jpg",
+            name = "cei 2012",
+            resource_uri = "/api/v2/election/1/",
+            slug = "cei-2012",
+            use_default_media_naranja_option = True
+            )
+        self.background_category = BackgroundCategory.objects.create(
+            name = 'Tendencia Politica',
+            resource_uri = "/api/v2/background_category/1/",
+            election=self.election,
+            remote_id=1,
+            )
+
+    def test_create_background(self):
+        background = Background.objects.create(
+            remote_id = 1,
+            name = 'Partido politico actual',
+            resource_uri = '/api/v2/background/1/',
+            background_category = self.background_category
+            )
+
+        self.assertTrue(background)
+        self.assertIsInstance(background, CandideitorgDocument)
+        self.assertEquals(background.name, 'Partido politico actual')
+        self.assertEquals(background.resource_uri, '/api/v2/background/1/')
+        self.assertEquals(background.background_category, self.background_category)
+
+    def test_fetch_all_background_from_api(self):
+        self.election.delete()
+        Election.fetch_all_from_api()
+        election = Election.objects.all()[0]
+        background_category = BackgroundCategory.objects.get(remote_id=1)
+
+        self.assertEquals(Background.objects.count(),4)
+        background = Background.objects.get(remote_id=1)
+        self.assertEquals(background.name,'Partido politico actual')
+        self.assertEquals(background.resource_uri,'/api/v2/background/1/')
+        self.assertEquals(background.background_category, background_category)
