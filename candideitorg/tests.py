@@ -8,7 +8,7 @@ Replace this with more appropriate tests for your application.
 from django.test import TestCase
 import slumber
 from candideitorg.models import CandideitorgDocument, Election, Category, Candidate, BackgroundCategory,\
-                                PersonalData, Background
+                                PersonalData, Background, Answer
 from django.core.management import call_command
 from django.utils.unittest import skip
 
@@ -304,3 +304,51 @@ class BackgroundTest(TestCase):
         self.assertEquals(background.name,'Partido politico actual')
         self.assertEquals(background.resource_uri,'/api/v2/background/1/')
         self.assertEquals(background.background_category, background_category)
+
+class AnswersTest(TestCase):
+    def setUp(self):
+        super(AnswersTest, self).setUp()
+        self.election = Election.objects.create(
+            description = "Elecciones CEI 2012",
+            remote_id = 1,
+            information_source = "",
+            logo = "/media/photos/dummy.jpg",
+            name = "cei 2012",
+            resource_uri = "/api/v2/election/1/",
+            slug = "cei-2012",
+            use_default_media_naranja_option = True
+            )
+        self.candidate = Candidate.objects.create(
+            name = "Juanito Perez",
+            photo = "/media/photos/dummy.jpg",
+            slug = "juanito-perez",
+            has_answered = True,
+            election = self.election,
+            remote_id = 1
+            )
+
+    def test_create_answer(self):
+        answers = Answer.objects.create(
+            remote_id = 1,
+            caption = 'De vez en cuando',
+            question = '/api/v2/question/2/',
+            resource_uri = '/api/v2/answer/8/',
+            candidate = self.candidate,
+            )
+        self.assertTrue(answers)
+        self.assertIsInstance(answers, CandideitorgDocument)
+        self.assertEquals(answers.caption, 'De vez en cuando')
+        self.assertEquals(answers.question, '/api/v2/question/2/')
+        self.assertEquals(answers.resource_uri, '/api/v2/answer/8/')
+
+    def test_fetch_all_answers_from_api(self):
+        self.election.delete()
+        Election.fetch_all_from_api()
+        election = Election.objects.all()[0]
+        candidate = Candidate.objects.get(remote_id=1)
+
+        self.assertEquals(Answer.objects.count(),1)
+        answer = Answer.objects.get(remote_id=8)
+        self.assertEquals(answer.caption,'De vez en cuando')
+        self.assertEquals(answer.resource_uri,'/api/v2/answer/8/')
+        self.assertEquals(answer.candidate, candidate)
