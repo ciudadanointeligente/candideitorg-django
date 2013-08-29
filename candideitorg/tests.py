@@ -8,7 +8,7 @@ Replace this with more appropriate tests for your application.
 from django.test import TestCase
 import slumber
 from candideitorg.models import CandideitorgDocument, Election, Category, Candidate, BackgroundCategory,\
-                                PersonalData, Background, Answer
+                                PersonalData, Background, Answer, Question
 from django.core.management import call_command
 from django.utils.unittest import skip
 
@@ -327,6 +327,7 @@ class AnswersTest(TestCase):
             remote_id = 1
             )
 
+    @skip('a')
     def test_create_answer(self):
         answers = Answer.objects.create(
             remote_id = 1,
@@ -341,6 +342,7 @@ class AnswersTest(TestCase):
         self.assertEquals(answers.question, '/api/v2/question/2/')
         self.assertEquals(answers.resource_uri, '/api/v2/answer/8/')
 
+    @skip('a')
     def test_fetch_all_answers_from_api(self):
         self.election.delete()
         Election.fetch_all_from_api()
@@ -352,3 +354,39 @@ class AnswersTest(TestCase):
         self.assertEquals(answer.caption,'De vez en cuando')
         self.assertEquals(answer.resource_uri,'/api/v2/answer/8/')
         self.assertEquals(answer.candidate, candidate)
+
+class QuestionTest(TestCase):
+    def setUp(self):
+        super(QuestionTest, self).setUp()
+        self.election = Election.objects.create(
+            description = "Elecciones CEI 2012",
+            remote_id = 1,
+            information_source = "",
+            logo = "/media/photos/dummy.jpg",
+            name = "cei 2012",
+            resource_uri = "/api/v2/election/1/",
+            slug = "cei-2012",
+            use_default_media_naranja_option = True
+            )
+        self.category = Category.objects.create(
+            name='category name',
+            election=self.election,
+            slug='category-name',
+            order=1,
+            resource_uri='/api/v2/category/1/',
+            remote_id=1
+            )
+
+    def test_create_question(self):
+        question = Question.objects.create(
+            remote_id = 1,
+            question = 'Le gusta ir a las marchas?',
+            resource_uri = '/api/v2/question/2/',
+            category = self.category,
+            )
+        self.assertTrue(question)
+        self.assertIsInstance(question, CandideitorgDocument)
+        self.assertEquals(question.question, 'Le gusta ir a las marchas?')
+        self.assertEquals(question.resource_uri, '/api/v2/question/2/')
+
+    

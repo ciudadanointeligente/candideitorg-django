@@ -61,13 +61,13 @@ class Election(CandideitorgDocument):
             election = Election.create_new_from_dict(election_dict)
             for uri in election_dict['categories']:
                 dictionary = CandideitorgDocument.get_resource_as_dict(uri)
-                Category.create_new_from_dict(dictionary, election=election)
+                category = Category.create_new_from_dict(dictionary, election=election)
+                for uri in dictionary['questions']:
+                    dictionary = CandideitorgDocument.get_resource_as_dict(uri)
+                    Question.create_new_from_dict(dictionary, category=category)
             for uri in election_dict['candidates']:
                 dictionary = CandideitorgDocument.get_resource_as_dict(uri)
-                candidate = Candidate.create_new_from_dict(dictionary, election=election)
-                for uri in dictionary['answers']:
-                    dictionary = CandideitorgDocument.get_resource_as_dict(uri)
-                    Answer.create_new_from_dict(dictionary, candidate=candidate)
+                Candidate.create_new_from_dict(dictionary, election=election)
             for uri in election_dict['background_categories']:
                 dictionary = CandideitorgDocument.get_resource_as_dict(uri)
                 backgroundcategory = BackgroundCategory.create_new_from_dict(dictionary, election=election)
@@ -107,4 +107,8 @@ class Background(CandideitorgDocument):
 class Answer(CandideitorgDocument):
     candidate = models.ForeignKey(Candidate)
     caption = models.CharField(max_length=255)
+    question = models.ForeignKey('Question')
+
+class Question(CandideitorgDocument):
     question = models.CharField(max_length=255)
+    category = models.ForeignKey(Category)
