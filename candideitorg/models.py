@@ -40,6 +40,7 @@ class CandideitorgDocument(models.Model):
                 if key in field_names and key != "id":
                     new_element[key]= dicti[key]
         new_element["remote_id"] = dicti["id"]
+
         new_element.update(kwargs)
         return cls.objects.create(**new_element)
 
@@ -64,7 +65,10 @@ class Election(CandideitorgDocument):
                 category = Category.create_new_from_dict(dictionary, election=election)
                 for uri in dictionary['questions']:
                     dictionary = CandideitorgDocument.get_resource_as_dict(uri)
-                    Question.create_new_from_dict(dictionary, category=category)
+                    question = Question.create_new_from_dict(dictionary, category=category)
+                    for uri in dictionary['answers']:
+                        dictionary = CandideitorgDocument.get_resource_as_dict(uri)
+                        Answer.create_new_from_dict(dictionary,question=question)
             for uri in election_dict['candidates']:
                 dictionary = CandideitorgDocument.get_resource_as_dict(uri)
                 Candidate.create_new_from_dict(dictionary, election=election)
@@ -105,7 +109,6 @@ class Background(CandideitorgDocument):
     background_category = models.ForeignKey(BackgroundCategory)
 
 class Answer(CandideitorgDocument):
-    candidate = models.ForeignKey(Candidate)
     caption = models.CharField(max_length=255)
     question = models.ForeignKey('Question')
 
