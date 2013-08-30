@@ -60,6 +60,9 @@ class Election(CandideitorgDocument):
         elections_from_api = api.election.get()
         for election_dict in elections_from_api["objects"]:
             election = Election.create_new_from_dict(election_dict)
+            for uri in election_dict['candidates']:
+                dictionary = CandideitorgDocument.get_resource_as_dict(uri)
+                Candidate.create_new_from_dict(dictionary, election=election)
             for uri in election_dict['categories']:
                 dictionary = CandideitorgDocument.get_resource_as_dict(uri)
                 category = Category.create_new_from_dict(dictionary, election=election)
@@ -68,10 +71,11 @@ class Election(CandideitorgDocument):
                     question = Question.create_new_from_dict(dictionary, category=category)
                     for uri in dictionary['answers']:
                         dictionary = CandideitorgDocument.get_resource_as_dict(uri)
-                        Answer.create_new_from_dict(dictionary,question=question)
-            for uri in election_dict['candidates']:
-                dictionary = CandideitorgDocument.get_resource_as_dict(uri)
-                Candidate.create_new_from_dict(dictionary, election=election)
+                        answer = Answer.create_new_from_dict(dictionary,question=question)
+                        for candidate_uri in dictionary["candidates"]:
+                            candidate = Candidate.objects.get(resource_uri=candidate_uri)
+                            candidate.answers.add(answer)
+                            candidate.save()
             for uri in election_dict['background_categories']:
                 dictionary = CandideitorgDocument.get_resource_as_dict(uri)
                 backgroundcategory = BackgroundCategory.create_new_from_dict(dictionary, election=election)
@@ -95,6 +99,7 @@ class Candidate(CandideitorgDocument):
     slug = models.SlugField(max_length=255)
     has_answered = models.BooleanField()
     election = models.ForeignKey(Election)
+    answers = models.ManyToManyField('Answer')
 
 class BackgroundCategory(CandideitorgDocument):
     election = models.ForeignKey(Election)
@@ -111,6 +116,7 @@ class Background(CandideitorgDocument):
 class Answer(CandideitorgDocument):
     caption = models.CharField(max_length=255)
     question = models.ForeignKey('Question')
+    # candidate = models.ForeignKey(Candidate)
 
 class Question(CandideitorgDocument):
     question = models.CharField(max_length=255)

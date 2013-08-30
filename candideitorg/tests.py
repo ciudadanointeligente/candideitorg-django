@@ -328,9 +328,17 @@ class AnswersTest(TestCase):
             )
         self.question = Question.objects.create(
             remote_id = 1,
-            question = 'Le gusta ir a las marchas?',
-            resource_uri = '/api/v2/question/2/',
+            question = 'Esta de a cuerdo con los paros?',
+            resource_uri = '/api/v2/question/1/',
             category = self.category,
+            )
+        self.candidate = Candidate.objects.create(
+            name = "Juanito Perez",
+            photo = "/media/photos/dummy.jpg",
+            slug = "juanito-perez",
+            has_answered = True,
+            election = self.election,
+            remote_id = 1
             )
 
     def test_create_answer(self):
@@ -338,7 +346,7 @@ class AnswersTest(TestCase):
             remote_id = 1,
             caption = 'De vez en cuando',
             resource_uri = '/api/v2/answer/8/',
-            question = self.question,
+            question = self.question
             )
         self.assertTrue(answer)
         self.assertIsInstance(answer, CandideitorgDocument)
@@ -353,11 +361,32 @@ class AnswersTest(TestCase):
         category = Category.objects.all()[0]
         question = Question.objects.all()[0]
 
-        self.assertEquals(Answer.objects.count(),1)
-        # answer = Answer.objects.get(remote_id=8)
-        # self.assertEquals(answer.caption,'De vez en cuando')
-        # self.assertEquals(answer.resource_uri,'/api/v2/answer/8/')
-        # self.assertEquals(answer.candidate, candidate)
+        self.assertEquals(Answer.objects.count(),10)
+        answer = Answer.objects.get(remote_id=9)
+        self.assertEquals(answer.caption,'Puro perder clases')
+        self.assertEquals(answer.resource_uri,'/api/v2/answer/9/')
+        self.assertEquals(answer.question, question)
+
+    def test_get_candidates_has_answer(self):
+        candidate = self.candidate
+        answer = Answer.objects.create(
+            remote_id = 1,
+            caption = 'De vez en cuando',
+            resource_uri = '/api/v2/answer/8/',
+            question = self.question
+            )
+        candidate.answers.add(answer)
+        candidate.save()
+
+        self.assertEquals(candidate.answers.all().count(),1)
+        self.assertEquals(candidate.answers.all()[0],answer)
+
+    def test_associate_answers(self):
+        Election.fetch_all_from_api()
+        candidate1 = Candidate.objects.get(resource_uri="/api/v2/candidate/1/")
+        answer8 = Answer.objects.get(resource_uri="/api/v2/answer/8/")
+
+        self.assertIn(answer8, candidate1.answers.all())
 
 class QuestionTest(TestCase):
     def setUp(self):
