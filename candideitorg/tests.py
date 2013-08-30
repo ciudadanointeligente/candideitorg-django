@@ -353,7 +353,7 @@ class AnswersTest(TestCase):
         category = Category.objects.all()[0]
         question = Question.objects.all()[0]
 
-        # self.assertEquals(Answer.objects.count(),1)
+        self.assertEquals(Answer.objects.count(),1)
         # answer = Answer.objects.get(remote_id=8)
         # self.assertEquals(answer.caption,'De vez en cuando')
         # self.assertEquals(answer.resource_uri,'/api/v2/answer/8/')
