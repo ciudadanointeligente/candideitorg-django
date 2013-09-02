@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 This file demonstrates writing tests using the unittest module. These will pass
 when you run "manage.py test".
@@ -12,6 +13,7 @@ from candideitorg.models import CandideitorgDocument, Election, Category, Candid
 from django.core.management import call_command
 from django.utils.unittest import skip
 from django.template import Template, Context
+from django.utils.translation import ugettext as _
 
 class CandideitorgDocumentTest(TestCase):
     
@@ -446,7 +448,19 @@ class TemplateTagsTest(TestCase):
         answer = Answer.objects.get(resource_uri="/api/v2/answer/8/")
         expected_html = '<li>'+answer.caption+'</li>'
 
-        template = Template("{% load candideitorg %}{% answer_for_candidate_and_question candidate question %}")
+        template = Template("{% load candideitorg_templetags %}{% answer_for_candidate_and_question candidate question %}")
         context = Context({'candidate':candidate,'question':question})
 
         self.assertEquals(template.render(context),expected_html)
+
+    def test_template_tag_when_no_answer_is_selected(self):
+        candidate = Candidate.objects.get(resource_uri="/api/v2/candidate/1/")
+        question = Question.objects.get(resource_uri="/api/v2/question/3/")
+        #No one has answered the question 3
+        expected_html = '<li>'+_(u"Aún no hay respuesta")+'</li>'
+        template = Template("{% load candideitorg_templetags %}{% answer_for_candidate_and_question candidate question %}")
+        context = Context({'candidate':candidate,'question':question})
+
+
+        self.assertEquals(template.render(context),expected_html)
+
