@@ -11,6 +11,7 @@ from candideitorg.models import CandideitorgDocument, Election, Category, Candid
                                 PersonalData, Background, Answer, Question
 from django.core.management import call_command
 from django.utils.unittest import skip
+from django.template import Template, Context
 
 class CandideitorgDocumentTest(TestCase):
     
@@ -433,3 +434,19 @@ class QuestionTest(TestCase):
         self.assertEquals(question.question, 'Esta de a cuerdo con los paros?')
         self.assertEquals(question.category, category)
         self.assertEquals(question.resource_uri, '/api/v2/question/1/')
+
+class TemplateTagsTest(TestCase):
+    def setUp(self):
+        super(TemplateTagsTest, self).setUp()
+        self.election = Election.fetch_all_from_api()
+
+    def test_templatetag_candidate_answer_value(self):
+        question = Question.objects.get(resource_uri="/api/v2/question/2/")
+        candidate = Candidate.objects.get(resource_uri="/api/v2/candidate/1/")
+        answer = Answer.objects.get(resource_uri="/api/v2/answer/8/")
+        expected_html = '<li>'+answer.caption+'</li>'
+
+        template = Template("{% load candideitorg %}{% answer_for_candidate_and_question candidate question %}")
+        context = Context({'candidate':candidate,'question':question})
+
+        self.assertEquals(template.render(context),expected_html)
