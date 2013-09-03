@@ -9,7 +9,8 @@ Replace this with more appropriate tests for your application.
 from django.test import TestCase
 import slumber
 from candideitorg.models import CandideitorgDocument, Election, Category, Candidate, BackgroundCategory,\
-                                PersonalData, Background, Answer, Question
+                                PersonalData, Background, Answer, Question, PersonalDataCandidate, Link,\
+                                BackgroundCandidate
 from django.core.management import call_command
 from django.utils.unittest import skip
 from django.template import Template, Context
@@ -464,3 +465,129 @@ class TemplateTagsTest(TestCase):
 
         self.assertEquals(template.render(context),expected_html)
 
+class PersonalDataCandidateTest(TestCase):
+    def setUp(self):
+        super(PersonalDataCandidateTest, self).setUp()
+        self.election = Election.objects.create(
+            description = "Elecciones CEI 2012",
+            remote_id = 1,
+            information_source = "",
+            logo = "/media/photos/dummy.jpg",
+            name = "cei 2012",
+            resource_uri = "/api/v2/election/1/",
+            slug = "cei-2012",
+            use_default_media_naranja_option = True
+            )
+        self.candidate = Candidate.objects.create(
+            name = "Juanito Perez",
+            photo = "/media/photos/dummy.jpg",
+            slug = "juanito-perez",
+            has_answered = True,
+            election = self.election,
+            remote_id = 1
+            )
+        self.personaldata = PersonalData.objects.create(
+            label = 'Nacimiento',
+            remote_id = 1,
+            election = self.election
+            )
+
+    def test_create_personal_data_candidate(self):
+        personal_data_candidate = PersonalDataCandidate.objects.create(
+            remote_id = 1,
+            resource_uri = "/api/v2/personal_data_candidate/1/",
+            value = "13/13/13",
+            candidate = self.candidate,
+            personaldata = self.personaldata
+            )
+        self.assertTrue(personal_data_candidate)
+        self.assertIsInstance(personal_data_candidate, CandideitorgDocument)
+        self.assertEquals(personal_data_candidate.value,'13/13/13')
+        self.assertEquals(personal_data_candidate.resource_uri, '/api/v2/personal_data_candidate/1/')
+        self.assertEquals(personal_data_candidate.candidate, self.candidate)
+        self.assertEquals(personal_data_candidate.personaldata, self.personaldata)
+
+    def test_get_all_personal_data_candidate_from_api(self):
+        self.election.delete()
+        Election.fetch_all_from_api()
+
+        election = Election.objects.all()[0]
+        candidate = Candidate.objects.all()[0]
+        personal_data = PersonalData.objects.all()[0]
+
+        self.assertEquals(PersonalDataCandidate.objects.count(),2)
+        personal_data_candidate = PersonalDataCandidate.objects.all()[0]
+        self.assertEquals(personal_data_candidate.value,'13/13/13')
+        self.assertEquals(personal_data_candidate.candidate, candidate)
+        self.assertEquals(personal_data_candidate.personaldata, personal_data)
+
+class LinkTest(TestCase):
+    def setUp(self):
+        super(LinkTest,self).setUp()
+        self.election = Election.objects.create(
+            description = "Elecciones CEI 2012",
+            remote_id = 1,
+            information_source = "",
+            logo = "/media/photos/dummy.jpg",
+            name = "cei 2012",
+            resource_uri = "/api/v2/election/1/",
+            slug = "cei-2012",
+            use_default_media_naranja_option = True
+            )
+        self.candidate = Candidate.objects.create(
+            name = "Juanito Perez",
+            photo = "/media/photos/dummy.jpg",
+            slug = "juanito-perez",
+            has_answered = True,
+            election = self.election,
+            remote_id = 1
+            )
+
+    def test_create_link(self):
+        link = Link.objects.create(
+            name = 'twitter',
+            url = 'http://www.twitter.com',
+            candidate = self.candidate,
+            remote_id = 1
+            )
+        self.assertTrue(link)
+
+    def test_get_links_from_api(self):
+        self.election.delete()
+        Election.fetch_all_from_api()
+
+        election = Election.objects.all()[0]
+        candidate = Candidate.objects.all()[0]
+        link = Link.objects.all()[0]
+        
+        self.assertEquals(Link.objects.count(),1)
+        self.assertEquals(link.url, 'http://www.twitter.com')
+
+class BackgroundCandidateTest(TestCase):
+    def setUp(self):
+        super(BackgroundCandidateTest, self).setUp()
+        Election.fetch_all_from_api()
+
+    def test_create_background_candidate(self):
+        background = Background.objects.get(id=1)
+        candidate = Candidate.objects.get(id= 1)
+        background_candidate = BackgroundCandidate.objects.create(
+            value = 'CCC',
+            remote_id = 1,
+            candidate = candidate,
+            background = background
+            )
+        self.assertTrue(background_candidate)
+        self.assertIsInstance(background_candidate, CandideitorgDocument)
+        self.assertEquals(background_candidate.value,'CCC')
+
+    def test_get_all_background_candidates_from_api(self):
+        candidate = Candidate.objects.get(resource_uri="/api/v2/candidate/1/")
+        background = Background.objects.get(resource_uri="/api/v2/background/1/")
+
+        backgrounds_candidates = BackgroundCandidate.objects.filter(
+            resource_uri="/api/v2/backgrounds_candidate/1/")
+        self.assertEquals(backgrounds_candidates.count(), 1)
+        background_candidate = backgrounds_candidates[0]
+        self.assertEquals(background_candidate.candidate, candidate)
+        self.assertEquals(background_candidate.background, background)

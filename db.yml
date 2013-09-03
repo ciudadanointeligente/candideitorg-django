@@ -148,3 +148,6 @@
 - fields: {created: !!timestamp '2013-08-23 13:12:43', key: a, user: 1}
   model: tastypie.apikey
   pk: 1
+- fields: {candidate: 3, name: twitter, url: 'http://www.twitter.com'}
+  model: elections.link
+  pk: 1
