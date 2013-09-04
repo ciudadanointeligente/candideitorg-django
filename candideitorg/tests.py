@@ -465,6 +465,17 @@ class TemplateTagsTest(TestCase):
 
         self.assertEquals(template.render(context),expected_html)
 
+    def test_templatetag_personal_data(self):
+        candidate = Candidate.objects.get(resource_uri="/api/v2/candidate/1/")
+        personal_data = PersonalData.objects.get(resource_uri="/api/v2/personal_data/1/")
+        personal_data_candidate = PersonalDataCandidate.objects.get(resource_uri="/api/v2/personal_data_candidate/1/")
+        expected_html = personal_data_candidate.value
+
+        template = Template("{% load candideitorg_templetags %}{% relation_personal_data_candidate candidate personal_data %}")
+        context = Context({'candidate':candidate,'personal_data':personal_data})
+
+        self.assertEquals(template.render(context),expected_html)
+
 class PersonalDataCandidateTest(TestCase):
     def setUp(self):
         super(PersonalDataCandidateTest, self).setUp()
@@ -562,6 +573,28 @@ class LinkTest(TestCase):
         
         self.assertEquals(Link.objects.count(),1)
         self.assertEquals(link.url, 'http://www.twitter.com')
+
+    def test_get_links_extra_classes_for_twitter(self):
+        link = Link.objects.create(
+            name = 'twitter',
+            url = 'http://www.twitter.com',
+            candidate = self.candidate,
+            remote_id = 1
+            )
+
+        expected_extra_links = 'icon-twitter-sign'
+        self.assertEquals(link.icon_class, expected_extra_links)
+
+    def test_get_links_extra_classes_for_facebook(self):
+        link = Link.objects.create(
+            name = 'mi_feisBuuK',
+            url = 'http://www.facebook.com',
+            candidate = self.candidate,
+            remote_id = 1
+            )
+
+        expected_extra_links = 'icon-facebook-sign'
+        self.assertEquals(link.icon_class, expected_extra_links)
 
 class BackgroundCandidateTest(TestCase):
     def setUp(self):

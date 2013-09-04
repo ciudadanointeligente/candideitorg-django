@@ -1,7 +1,11 @@
 import slumber
+import re
 from django.db import models
 from candideitorg.apikey_auth import ApiKeyAuth
 from slumber import url_join, Resource
+
+twitter_regexp = re.compile(r"^https?://[^/]*(t\.co|twitter\.com)(/.*|/?)")
+facebook_regexp = re.compile(r"^https?://[^/]*(facebook\.com|fb\.com|fb\.me)(/.*|/?)")
 
 # Create your models here.
 class CandideitorgDocument(models.Model):
@@ -147,6 +151,16 @@ class Link(CandideitorgDocument):
     url = models.URLField(max_length=255)
     name = models.CharField(max_length=255)
     candidate = models.ForeignKey(Candidate)
+
+    @property
+    def icon_class(self):
+        if twitter_regexp.match(self.url):
+            return "icon-twitter-sign"
+        elif facebook_regexp.match(self.url):
+            return "icon-facebook-sign"
+        else:
+            return "icon-globe"
+
 
 class BackgroundCandidate(CandideitorgDocument):
     value = models.CharField(max_length=255)

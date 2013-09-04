@@ -18,3 +18,10 @@ def answer_for_candidate_and_question(candidate, question):
     except:
         pass
     return '<li>'+_(u"Aún no hay respuesta")+'</li>'
+
+@register.simple_tag
+def relation_personal_data_candidate(candidate, personaldata):
+    try:
+        return personaldata.personaldatacandidate_set.get(candidate=candidate).value
+    except:
+        return _('no message')
