@@ -43,3 +43,5 @@ local_settings.py
 
 /candideitorg-for-testing/
 start-local-candideitorg.sh
+
+*.sqlite3

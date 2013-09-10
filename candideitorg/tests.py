@@ -447,7 +447,7 @@ class TemplateTagsTest(TestCase):
         question = Question.objects.get(resource_uri="/api/v2/question/2/")
         candidate = Candidate.objects.get(resource_uri="/api/v2/candidate/1/")
         answer = Answer.objects.get(resource_uri="/api/v2/answer/8/")
-        expected_html = '<li>'+answer.caption+'</li>'
+        expected_html = answer.caption
 
         template = Template("{% load candideitorg_templetags %}{% answer_for_candidate_and_question candidate question %}")
         context = Context({'candidate':candidate,'question':question})
@@ -458,7 +458,7 @@ class TemplateTagsTest(TestCase):
         candidate = Candidate.objects.get(resource_uri="/api/v2/candidate/1/")
         question = Question.objects.get(resource_uri="/api/v2/question/3/")
         #No one has answered the question 3
-        expected_html = '<li>'+_(u"Aún no hay respuesta")+'</li>'
+        expected_html = _(u"Aún no hay respuesta")
         template = Template("{% load candideitorg_templetags %}{% answer_for_candidate_and_question candidate question %}")
         context = Context({'candidate':candidate,'question':question})
 

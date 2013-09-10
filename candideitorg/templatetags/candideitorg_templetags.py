@@ -14,10 +14,10 @@ def answer_for_candidate_and_question(candidate, question):
     '''
 
     try:
-        return '<li>'+question.answer_set.get(candidate=candidate).caption+'</li>'
+        return question.answer_set.get(candidate=candidate).caption
     except:
         pass
-    return '<li>'+_(u"Aún no hay respuesta")+'</li>'
+    return _(u"Aún no hay respuesta")
 
 @register.simple_tag
 def relation_personal_data_candidate(candidate, personaldata):
