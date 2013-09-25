@@ -3,7 +3,7 @@ import re
 from django.db import models
 from candideitorg.apikey_auth import ApiKeyAuth
 from slumber import url_join, Resource
-
+from django.conf import settings
 twitter_regexp = re.compile(r"^https?://[^/]*(t\.co|twitter\.com)(/.*|/?)")
 facebook_regexp = re.compile(r"^https?://[^/]*(facebook\.com|fb\.com|fb\.me)(/.*|/?)")
 
@@ -14,7 +14,7 @@ class CandideitorgDocument(models.Model):
 
     @classmethod
     def get_api(cls):
-        api = slumber.API("http://127.0.0.1:8000/api/v2/", auth=ApiKeyAuth("admin", "a"))
+        api = slumber.API(settings.CANDIDEITORG_URL, auth=ApiKeyAuth(settings.CANDIDEITORG_USERNAME, settings.CANDIDEITORG_API_KEY))
         return api
 
     class Meta:

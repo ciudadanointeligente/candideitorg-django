@@ -15,10 +15,10 @@ set -e
 
 # just checkout the mysociety-deploy branch
 # http://stackoverflow.com/a/7349740/5349
-export DIR=candidator-for-testing
+export DIR=candidator
 export BRANCH=master
 export REMOTE_REPO=https://github.com/ciudadanointeligente/candidator.git
-export PORT=3001
+export PORT=3002
 export VIRTUALENV=candidator-for-testing
 
 if [ ! -e $DIR ]; then mkdir $DIR; fi
@@ -55,5 +55,5 @@ fi
 
 # give it a chance to start and then print out the url to it
 sleep 2
-python manage.py runserver $PORT > candidator_access.log &
+python manage.py runserver $PORT &
 echo "candidator should now be running on http://localhost:$PORT/api"
