@@ -651,7 +651,7 @@ class SignalAfterAllTestCase(TestCase):
             self.assertIsInstance(sender, Election)
 
         signal_receiver = MethodCallLogger(signal_receiver)
-
+        #connecting the thing
         election_finished.connect(signal_receiver)
 
         Election.fetch_all_from_api()
