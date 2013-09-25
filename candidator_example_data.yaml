@@ -151,11 +151,3 @@
 - fields: {candidate: 3, name: twitter, url: 'http://www.twitter.com'}
   model: elections.link
   pk: 1
-- fields: {candidate: 1, personaldata: 1, remote_id: 1, resource_uri: /api/v2/personal_data_candidate/1/,
-    value: 13/13/13}
-  model: candideitorg.personaldatacandidate
-  pk: 1
-- fields: {candidate: 1, personaldata: 2, remote_id: 2, resource_uri: /api/v2/personal_data_candidate/2/,
-    value: Estudiante}
-  model: candideitorg.personaldatacandidate
-  pk: 2

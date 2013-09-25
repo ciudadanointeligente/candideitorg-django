@@ -16,7 +16,7 @@ set -e
 # just checkout the mysociety-deploy branch
 # http://stackoverflow.com/a/7349740/5349
 export DIR=candidator
-export BRANCH=master
+export BRANCH=cand-django
 export REMOTE_REPO=https://github.com/ciudadanointeligente/candidator.git
 export PORT=3002
 export VIRTUALENV=candidator-for-testing
