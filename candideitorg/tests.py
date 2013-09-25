@@ -624,3 +624,36 @@ class BackgroundCandidateTest(TestCase):
         background_candidate = backgrounds_candidates[0]
         self.assertEquals(background_candidate.candidate, candidate)
         self.assertEquals(background_candidate.background, background)
+
+from candideitorg.models import election_finished
+from django.dispatch import receiver
+
+# defininig the proxy according to 
+# http://stackoverflow.com/questions/3829742/assert-that-a-method-was-called-in-a-python-unit-test
+
+class MethodCallLogger(object):
+   def __init__(self, method):
+     self.method = method
+     self.was_called = False
+
+   def __call__(self, sender=None, **kwargs):
+     self.method(sender, **kwargs)
+     self.was_called = True
+
+class SignalAfterAllTestCase(TestCase):
+    def setUp(self):
+        super(SignalAfterAllTestCase, self).setUp()
+
+    def test_a_signal_is_called(self):
+
+        #defining the receiver
+        def signal_receiver(sender, **kwargs):
+            self.assertIsInstance(sender, Election)
+
+        signal_receiver = MethodCallLogger(signal_receiver)
+        #connecting the thing
+        election_finished.connect(signal_receiver)
+
+        Election.fetch_all_from_api()
+
+        self.assertTrue(signal_receiver.was_called)

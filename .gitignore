@@ -41,7 +41,7 @@ nosetests.xml
 *.pyc
 local_settings.py
 
-/candideitorg-for-testing/
+candidator
 start-local-candideitorg.sh
 
 *.sqlite3

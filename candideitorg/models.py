@@ -3,9 +3,15 @@ import re
 from django.db import models
 from candideitorg.apikey_auth import ApiKeyAuth
 from slumber import url_join, Resource
+from django.conf import settings
+import django.dispatch
+
 
 twitter_regexp = re.compile(r"^https?://[^/]*(t\.co|twitter\.com)(/.*|/?)")
 facebook_regexp = re.compile(r"^https?://[^/]*(facebook\.com|fb\.com|fb\.me)(/.*|/?)")
+
+
+election_finished = django.dispatch.Signal(providing_args=[])
 
 # Create your models here.
 class CandideitorgDocument(models.Model):
@@ -14,7 +20,7 @@ class CandideitorgDocument(models.Model):
 
     @classmethod
     def get_api(cls):
-        api = slumber.API("http://127.0.0.1:8000/api/v2/", auth=ApiKeyAuth("admin", "a"))
+        api = slumber.API(settings.CANDIDEITORG_URL, auth=ApiKeyAuth(settings.CANDIDEITORG_USERNAME, settings.CANDIDEITORG_API_KEY))
         return api
 
     class Meta:
@@ -105,6 +111,8 @@ class Election(CandideitorgDocument):
                             candidate = Candidate.objects.get(resource_uri=candidate_uri)
                             candidate.answers.add(answer)
                             candidate.save()
+
+            election_finished.send(sender=election)
 
 
 class Category(CandideitorgDocument):
