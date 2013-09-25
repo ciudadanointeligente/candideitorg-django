@@ -9,4 +9,4 @@ env:
 before_script:
   - ./start_local_candideitorg.bash
 script:
-  - python manage.py test elections
+  - python manage.py test candideitorg
