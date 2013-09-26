@@ -57,11 +57,11 @@ class CandideitorgDocument(models.Model):
 
 
 class Election(CandideitorgDocument):
-    information_source = models.TextField()
+    information_source = models.TextField(null=True)
     description = models.TextField()
     name = models.CharField(max_length=255)
-    logo = models.CharField(max_length=255)
-    use_default_media_naranja_option = models.BooleanField()
+    logo = models.CharField(max_length=255, null=True)
+    use_default_media_naranja_option = models.BooleanField(default=False)
     slug = models.SlugField(max_length=255)
 
     @classmethod
@@ -122,7 +122,7 @@ class Category(CandideitorgDocument):
     slug = models.SlugField(max_length=255)
 
 class Candidate(CandideitorgDocument):
-    photo = models.CharField(max_length=255)
+    photo = models.CharField(max_length=255, null=True)
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255)
     has_answered = models.BooleanField()
@@ -151,7 +151,7 @@ class Question(CandideitorgDocument):
     category = models.ForeignKey(Category)
 
 class PersonalDataCandidate(CandideitorgDocument):
-    value = models.CharField(max_length=255)
+    value = models.CharField(max_length=255, null=True)
     candidate = models.ForeignKey(Candidate)
     personaldata = models.ForeignKey(PersonalData)
 
