@@ -49,6 +49,90 @@ class CandideitorgDocumentTest(TestCase):
         api = Element.get_api()
         self.assertIsInstance(api, slumber.API)
 
+
+class PossibleNullValues(TestCase):
+    def setUp(self):
+        super(PossibleNullValues, self).setUp()
+
+    def test_election_null_values(self):
+        election = Election.objects.create(
+            description = "Elecciones CEI 2012",
+            remote_id = 1,
+            information_source = None,
+            logo = None,
+            name = "cei 2012",
+            resource_uri = "/api/v2/election/1/",
+            slug = "cei-2012"
+            )
+
+        self.assertTrue(election)
+        self.assertIsNone(election.logo)
+        self.assertIsNone(election.information_source)
+        self.assertFalse(election.use_default_media_naranja_option)
+
+
+    def test_candidate_null_values(self):
+        self.election = Election.objects.create(
+            description = "Elecciones CEI 2012",
+            remote_id = 1,
+            information_source = "",
+            logo = "/media/photos/dummy.jpg",
+            name = "cei 2012",
+            resource_uri = "/api/v2/election/1/",
+            slug = "cei-2012",
+            use_default_media_naranja_option = True
+            )        
+        candidate = Candidate.objects.create(
+            name = "Juanito Perez",
+            photo = None,
+            slug = "juanito-perez",
+            has_answered = True,
+            election = self.election,
+            remote_id = 1
+            )
+
+        self.assertTrue(candidate)
+        self.assertIsNone(candidate.photo)
+
+
+    def test_personal_data_candidate_null_values(self):
+        self.election = Election.objects.create(
+            description = "Elecciones CEI 2012",
+            remote_id = 1,
+            information_source = "",
+            logo = "/media/photos/dummy.jpg",
+            name = "cei 2012",
+            resource_uri = "/api/v2/election/1/",
+            slug = "cei-2012",
+            use_default_media_naranja_option = True
+            )
+        self.candidate = Candidate.objects.create(
+            name = "Juanito Perez",
+            photo = "/media/photos/dummy.jpg",
+            slug = "juanito-perez",
+            has_answered = True,
+            election = self.election,
+            remote_id = 1
+            )
+        self.personaldata = PersonalData.objects.create(
+            label = 'Nacimiento',
+            remote_id = 1,
+            election = self.election
+            )
+
+        personal_data_candidate = PersonalDataCandidate.objects.create(
+            remote_id = 1,
+            resource_uri = "/api/v2/personal_data_candidate/1/",
+            value = None,
+            candidate = self.candidate,
+            personaldata = self.personaldata
+            )
+
+        self.assertTrue(personal_data_candidate)
+        self.assertIsNone(personal_data_candidate.value)
+
+
+
 class ElectionTest(TestCase):
     def setUp(self):
         super(ElectionTest, self).setUp()

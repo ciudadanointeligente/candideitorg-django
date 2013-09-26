@@ -55,5 +55,5 @@ fi
 
 # give it a chance to start and then print out the url to it
 sleep 2
-python manage.py runserver $PORT &
+python manage.py runserver_plus $PORT &
 echo "candidator should now be running on http://localhost:$PORT/api"

@@ -10,6 +10,6 @@ DATABASES = {
         "NAME":   "candideitorg-django.sqlite3",
     }
 }
-CANDIDEITORG_URL = 'http://localhost:3002/api/v2/'
+CANDIDEITORG_URL = 'http://127.0.0.1:3002/api/v2/'
 CANDIDEITORG_USERNAME = 'admin'
 CANDIDEITORG_API_KEY = 'a'
