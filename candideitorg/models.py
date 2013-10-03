@@ -68,51 +68,59 @@ class Election(CandideitorgDocument):
     def fetch_all_from_api(cls):
         api = cls.get_api()
         elections_from_api = api.election.get()
-        for election_dict in elections_from_api["objects"]:
-            election = Election.create_new_from_dict(election_dict)
-            for uri in election_dict['personal_data']:
-                dictionary = CandideitorgDocument.get_resource_as_dict(uri)
-                PersonalData.create_new_from_dict(dictionary, election=election)
-            for uri in election_dict['background_categories']:
-                dictionary = CandideitorgDocument.get_resource_as_dict(uri)
-                backgroundcategory = BackgroundCategory.create_new_from_dict(dictionary, election=election)
-                for uri in dictionary['background']:
+        meta = elections_from_api['meta']
+        while True:
+            for election_dict in elections_from_api["objects"]:
+                election = Election.create_new_from_dict(election_dict)
+                for uri in election_dict['personal_data']:
                     dictionary = CandideitorgDocument.get_resource_as_dict(uri)
-                    Background.create_new_from_dict(dictionary, background_category=backgroundcategory)
-            for uri in election_dict['candidates']:
-                candidate_dictionary = CandideitorgDocument.get_resource_as_dict(uri)
-                candidate = Candidate.create_new_from_dict(candidate_dictionary, election=election)
-                for uri in candidate_dictionary['personal_data_candidate']:
-                    pdc_dictionary = CandideitorgDocument.get_resource_as_dict(uri)
-                    personal_data = PersonalData.objects.get(resource_uri=pdc_dictionary["personal_data"])
-                    PersonalDataCandidate.create_new_from_dict(pdc_dictionary, 
-                        candidate=candidate, 
-                        personaldata=personal_data)
-                for uri in candidate_dictionary['links']:
+                    PersonalData.create_new_from_dict(dictionary, election=election)
+                for uri in election_dict['background_categories']:
                     dictionary = CandideitorgDocument.get_resource_as_dict(uri)
-                    Link.create_new_from_dict(dictionary, candidate=candidate)
-
-                for uri in candidate_dictionary['backgrounds_candidate']:
-                    dictionary = CandideitorgDocument.get_resource_as_dict(uri)
-                    background = Background.objects.get(resource_uri=dictionary["background"])
-                    BackgroundCandidate.create_new_from_dict(dictionary, 
-                        candidate=candidate, 
-                        background=background)
-            for uri in election_dict['categories']:
-                dictionary = CandideitorgDocument.get_resource_as_dict(uri)
-                category = Category.create_new_from_dict(dictionary, election=election)
-                for uri in dictionary['questions']:
-                    dictionary = CandideitorgDocument.get_resource_as_dict(uri)
-                    question = Question.create_new_from_dict(dictionary, category=category)
-                    for uri in dictionary['answers']:
+                    backgroundcategory = BackgroundCategory.create_new_from_dict(dictionary, election=election)
+                    for uri in dictionary['background']:
                         dictionary = CandideitorgDocument.get_resource_as_dict(uri)
-                        answer = Answer.create_new_from_dict(dictionary,question=question)
-                        for candidate_uri in dictionary["candidates"]:
-                            candidate = Candidate.objects.get(resource_uri=candidate_uri)
-                            candidate.answers.add(answer)
-                            candidate.save()
+                        Background.create_new_from_dict(dictionary, background_category=backgroundcategory)
+                for uri in election_dict['candidates']:
+                    candidate_dictionary = CandideitorgDocument.get_resource_as_dict(uri)
+                    candidate = Candidate.create_new_from_dict(candidate_dictionary, election=election)
+                    for uri in candidate_dictionary['personal_data_candidate']:
+                        pdc_dictionary = CandideitorgDocument.get_resource_as_dict(uri)
+                        personal_data = PersonalData.objects.get(resource_uri=pdc_dictionary["personal_data"])
+                        PersonalDataCandidate.create_new_from_dict(pdc_dictionary, 
+                            candidate=candidate, 
+                            personaldata=personal_data)
+                    for uri in candidate_dictionary['links']:
+                        dictionary = CandideitorgDocument.get_resource_as_dict(uri)
+                        Link.create_new_from_dict(dictionary, candidate=candidate)
 
-            election_finished.send(sender=election)
+                    for uri in candidate_dictionary['backgrounds_candidate']:
+                        dictionary = CandideitorgDocument.get_resource_as_dict(uri)
+                        background = Background.objects.get(resource_uri=dictionary["background"])
+                        BackgroundCandidate.create_new_from_dict(dictionary, 
+                            candidate=candidate, 
+                            background=background)
+                for uri in election_dict['categories']:
+                    dictionary = CandideitorgDocument.get_resource_as_dict(uri)
+                    category = Category.create_new_from_dict(dictionary, election=election)
+                    for uri in dictionary['questions']:
+                        dictionary = CandideitorgDocument.get_resource_as_dict(uri)
+                        question = Question.create_new_from_dict(dictionary, category=category)
+                        for uri in dictionary['answers']:
+                            dictionary = CandideitorgDocument.get_resource_as_dict(uri)
+                            answer = Answer.create_new_from_dict(dictionary,question=question)
+                            for candidate_uri in dictionary["candidates"]:
+                                candidate = Candidate.objects.get(resource_uri=candidate_uri)
+                                candidate.answers.add(answer)
+                                candidate.save()
+
+                election_finished.send(sender=election)
+            offset = meta["offset"] + meta["limit"]
+            limit = meta["limit"] 
+            if not meta["next"]:
+                break
+            elections_from_api = api.election.get(offset=offset, limit=limit)
+            meta = elections_from_api['meta']
 
 
 class Category(CandideitorgDocument):

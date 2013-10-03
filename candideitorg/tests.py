@@ -15,6 +15,28 @@ from django.core.management import call_command
 from django.utils.unittest import skip
 from django.template import Template, Context
 from django.utils.translation import ugettext as _
+import subprocess
+import os
+
+class CandideitorgTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.install_candidator_yaml()
+
+    @classmethod
+    def install_candidator_yaml(cls, yaml_file='candidator_example_data'):
+        FNULL = open(os.devnull, 'w')
+        subprocess.call(['./candidator_install_yaml.bash', '../' + yaml_file + ".yaml"], stdout=FNULL, stderr=subprocess.STDOUT)
+
+
+class CandideitorgMoreThanTwentyElections(CandideitorgTestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.install_candidator_yaml(yaml_file="candidator_example_data_big")
+
+    def test_load_all_elections(self):
+        Election.fetch_all_from_api()
+        self.assertEquals(Election.objects.count(), 21)
 
 class CandideitorgDocumentTest(TestCase):
     
@@ -50,7 +72,7 @@ class CandideitorgDocumentTest(TestCase):
         self.assertIsInstance(api, slumber.API)
 
 
-class PossibleNullValues(TestCase):
+class PossibleNullValues(CandideitorgTestCase):
     def setUp(self):
         super(PossibleNullValues, self).setUp()
 
@@ -133,7 +155,7 @@ class PossibleNullValues(TestCase):
 
 
 
-class ElectionTest(TestCase):
+class ElectionTest(CandideitorgTestCase):
     def setUp(self):
         super(ElectionTest, self).setUp()
 
@@ -177,7 +199,7 @@ class ElectionTest(TestCase):
         self.assertEquals(election.slug, 'cei-2012')
         self.assertTrue(election.use_default_media_naranja_option)
 
-class CategoryTest(TestCase):
+class CategoryTest(CandideitorgTestCase):
 
     def setUp(self):
         super(CategoryTest, self).setUp()
@@ -224,7 +246,7 @@ class CategoryTest(TestCase):
         self.assertEquals(categorie.slug,'politicas-publicas')
         self.assertEquals(categorie.election, election)
 
-class CandidatesTest(TestCase):
+class CandidatesTest(CandideitorgTestCase):
     def setUp(self):
         super(CandidatesTest, self).setUp()
         self.election = Election.objects.create(
@@ -270,7 +292,7 @@ class CandidatesTest(TestCase):
         self.assertEquals(candidate.photo, '/media/photos/dummy.jpg')
         self.assertEquals(candidate.election, election)
 
-class BackgroundCategoriesTest(TestCase):
+class BackgroundCategoriesTest(CandideitorgTestCase):
     def setUp(self):
         super(BackgroundCategoriesTest, self).setUp()
         self.election = Election.objects.create(
@@ -309,7 +331,7 @@ class BackgroundCategoriesTest(TestCase):
         self.assertEquals(bg_categorie.name,'Tendencia Politica')
         self.assertEquals(bg_categorie.election,election)
 
-class PersonalDataTest(TestCase):
+class PersonalDataTest(CandideitorgTestCase):
     def setUp(self):
         super(PersonalDataTest, self).setUp()
         self.election = Election.objects.create(
@@ -347,7 +369,7 @@ class PersonalDataTest(TestCase):
         self.assertEquals(personal_data.label,'Nacimiento')
         self.assertEquals(personal_data.election, election)
 
-class BackgroundTest(TestCase):
+class BackgroundTest(CandideitorgTestCase):
     def setUp(self):
         super(BackgroundTest, self).setUp()
         self.election = Election.objects.create(
@@ -393,7 +415,7 @@ class BackgroundTest(TestCase):
         self.assertEquals(background.resource_uri,'/api/v2/background/1/')
         self.assertEquals(background.background_category, background_category)
 
-class AnswersTest(TestCase):
+class AnswersTest(CandideitorgTestCase):
     def setUp(self):
         super(AnswersTest, self).setUp()
         self.election = Election.objects.create(
@@ -476,7 +498,7 @@ class AnswersTest(TestCase):
 
         self.assertIn(answer8, candidate1.answers.all())
 
-class QuestionTest(TestCase):
+class QuestionTest(CandideitorgTestCase):
     def setUp(self):
         super(QuestionTest, self).setUp()
         self.election = Election.objects.create(
@@ -522,7 +544,7 @@ class QuestionTest(TestCase):
         self.assertEquals(question.category, category)
         self.assertEquals(question.resource_uri, '/api/v2/question/1/')
 
-class TemplateTagsTest(TestCase):
+class TemplateTagsTest(CandideitorgTestCase):
     def setUp(self):
         super(TemplateTagsTest, self).setUp()
         self.election = Election.fetch_all_from_api()
@@ -560,7 +582,7 @@ class TemplateTagsTest(TestCase):
 
         self.assertEquals(template.render(context),expected_html)
 
-class PersonalDataCandidateTest(TestCase):
+class PersonalDataCandidateTest(CandideitorgTestCase):
     def setUp(self):
         super(PersonalDataCandidateTest, self).setUp()
         self.election = Election.objects.create(
@@ -616,7 +638,7 @@ class PersonalDataCandidateTest(TestCase):
         self.assertEquals(personal_data_candidate.candidate, candidate)
         self.assertEquals(personal_data_candidate.personaldata, personal_data)
 
-class LinkTest(TestCase):
+class LinkTest(CandideitorgTestCase):
     def setUp(self):
         super(LinkTest,self).setUp()
         self.election = Election.objects.create(
@@ -680,7 +702,7 @@ class LinkTest(TestCase):
         expected_extra_links = 'icon-facebook-sign'
         self.assertEquals(link.icon_class, expected_extra_links)
 
-class BackgroundCandidateTest(TestCase):
+class BackgroundCandidateTest(CandideitorgTestCase):
     def setUp(self):
         super(BackgroundCandidateTest, self).setUp()
         Election.fetch_all_from_api()
@@ -724,7 +746,7 @@ class MethodCallLogger(object):
      self.method(sender, **kwargs)
      self.was_called = True
 
-class SignalAfterAllTestCase(TestCase):
+class SignalAfterAllTestCase(CandideitorgTestCase):
     def setUp(self):
         super(SignalAfterAllTestCase, self).setUp()
 
