@@ -38,6 +38,22 @@ class CandideitorgMoreThanTwentyElections(CandideitorgTestCase):
         Election.fetch_all_from_api()
         self.assertEquals(Election.objects.count(), 21)
 
+
+class UpdatingDataCandidator(CandideitorgTestCase):
+    def test_upgrade_data(self):
+        Election.fetch_all_from_api()
+        Election.fetch_all_from_api()
+        self.assertEquals(Election.objects.count(), 1)
+        self.assertEquals(Category.objects.count(), 2)
+        self.assertEquals(Candidate.objects.count(), 3)
+        self.assertEquals(BackgroundCategory.objects.count(),2)
+        self.assertEquals(PersonalData.objects.count(),4)
+        self.assertEquals(Background.objects.count(),4)
+        self.assertEquals(BackgroundCategory.objects.count(),2)
+
+
+
+
 class CandideitorgDocumentTest(TestCase):
     
     def setUp(self):

@@ -52,7 +52,11 @@ class CandideitorgDocument(models.Model):
         new_element["remote_id"] = dicti["id"]
 
         new_element.update(kwargs)
-        return cls.objects.create(**new_element)
+        existing_objects = cls.objects.filter(remote_id=dicti["id"]).count()
+        if existing_objects > 0:
+            return cls.objects.get(remote_id=dicti["id"])
+        else:
+            return cls.objects.create(**new_element)
 
 
 
