@@ -24,7 +24,7 @@ class CandideitorgTestCase(TestCase):
         cls.install_candidator_yaml()
 
     @classmethod
-    def install_candidator_yaml(cls, yaml_file='candidator_example_data'):
+    def install_candidator_yaml(cls, yaml_file='candidator_example_data_with_answers'):
         FNULL = open(os.devnull, 'w')
         subprocess.call(['./candidator_install_yaml.bash', '../' + yaml_file + ".yaml"], stdout=FNULL, stderr=subprocess.STDOUT)
 
@@ -51,8 +51,25 @@ class UpdatingDataCandidator(CandideitorgTestCase):
         self.assertEquals(Background.objects.count(),4)
         self.assertEquals(BackgroundCategory.objects.count(),2)
 
+    def test_updates_answer(self):
+        Election.fetch_all_from_api()
+        juanito = Candidate.objects.all()[0]
+        print juanito.answers.all()
+        UpdatingDataCandidator.install_candidator_yaml(yaml_file='candidator_example_data_with_answers2')
+        print juanito.answers.all()
 
-
+        #question 4
+        self.assertTrue(juanito.answers.filter(id=2))
+        self.assertFalse(juanito.answers.filter(id=1))
+        #question 3
+        self.assertTrue(juanito.answers.filter(id=5))
+        self.assertFalse(juanito.answers.filter(id=4))
+        #question 2
+        self.assertTrue(juanito.answers.filter(id=7))
+        self.assertFalse(juanito.answers.filter(id=8))
+        #question 1
+        self.assertFalse(juanito.answers.filter(id=9))
+        self.assertTrue(juanito.answers.filter(id=10))
 
 class CandideitorgDocumentTest(TestCase):
     
@@ -466,6 +483,16 @@ class AnswersTest(CandideitorgTestCase):
             election = self.election,
             remote_id = 1
             )
+
+    def test_unicode(self):
+        answer = Answer.objects.create(
+            remote_id = 1,
+            caption = 'De vez en cuando',
+            resource_uri = '/api/v2/answer/8/',
+            question = self.question
+            )
+
+        self.assertEquals(answer.__unicode__(), "'De vez en cuando' for 'Esta de a cuerdo con los paros?'")
 
     def test_create_answer(self):
         answer = Answer.objects.create(

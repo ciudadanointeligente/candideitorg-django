@@ -113,8 +113,11 @@ class Election(CandideitorgDocument):
                         for uri in dictionary['answers']:
                             dictionary = CandideitorgDocument.get_resource_as_dict(uri)
                             answer = Answer.create_new_from_dict(dictionary,question=question)
+                            print answer
                             for candidate_uri in dictionary["candidates"]:
                                 candidate = Candidate.objects.get(resource_uri=candidate_uri)
+                                question_of_the_answer = answer.question
+                                candidate.answers.filter(question=question_of_the_answer).delete()
                                 candidate.answers.add(answer)
                                 candidate.save()
 
@@ -157,6 +160,12 @@ class Answer(CandideitorgDocument):
     caption = models.CharField(max_length=255)
     question = models.ForeignKey('Question')
     # candidate = models.ForeignKey(Candidate)
+
+    def __unicode__(self):
+        return "'%(answer)s' for '%(question)s'"%{
+            "answer":self.caption,
+            "question":self.question.question,
+            }
 
 class Question(CandideitorgDocument):
     question = models.CharField(max_length=255)
