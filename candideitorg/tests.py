@@ -53,23 +53,23 @@ class UpdatingDataCandidator(CandideitorgTestCase):
 
     def test_updates_answer(self):
         Election.fetch_all_from_api()
-        juanito = Candidate.objects.all()[0]
-        print juanito.answers.all()
-        UpdatingDataCandidator.install_candidator_yaml(yaml_file='candidator_example_data_with_answers2')
-        print juanito.answers.all()
 
-        #question 4
-        self.assertTrue(juanito.answers.filter(id=2))
-        self.assertFalse(juanito.answers.filter(id=1))
-        #question 3
-        self.assertTrue(juanito.answers.filter(id=5))
-        self.assertFalse(juanito.answers.filter(id=4))
-        #question 2
-        self.assertTrue(juanito.answers.filter(id=7))
-        self.assertFalse(juanito.answers.filter(id=8))
-        #question 1
-        self.assertFalse(juanito.answers.filter(id=9))
-        self.assertTrue(juanito.answers.filter(id=10))
+        UpdatingDataCandidator.install_candidator_yaml(yaml_file='candidator_example_data_with_answers2')
+        Election.fetch_all_from_api()
+
+        juanito = Candidate.objects.all()[0]
+
+
+        paros = Question.objects.get(question='Esta de a cuerdo con los paros?')
+        marchas = Question.objects.get(question='Le gusta ir a las marchas?')
+        carretear = Question.objects.get(question='Quiere gastar su plata carreteando?')
+        plata = Question.objects.get(question='Quiere robarse la plata del CEI?')
+        
+
+        self.assertEquals(juanito.answers.get(question=paros).caption, u'Si, la llevan')
+        self.assertEquals(juanito.answers.get(question=marchas).caption, u'Siempre')
+        self.assertEquals(juanito.answers.get(question=carretear).caption, u'A veces')
+        self.assertEquals(juanito.answers.get(question=plata).caption, u'No')
 
 class CandideitorgDocumentTest(TestCase):
     
