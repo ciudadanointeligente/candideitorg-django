@@ -24,7 +24,7 @@ class CandideitorgTestCase(TestCase):
         cls.install_candidator_yaml()
 
     @classmethod
-    def install_candidator_yaml(cls, yaml_file='candidator_example_data_with_answers'):
+    def install_candidator_yaml(cls, yaml_file='candidator_example_data'):
         FNULL = open(os.devnull, 'w')
         subprocess.call(['./candidator_install_yaml.bash', '../' + yaml_file + ".yaml"], stdout=FNULL, stderr=subprocess.STDOUT)
 
@@ -481,6 +481,7 @@ class AnswersTest(CandideitorgTestCase):
             slug = "juanito-perez",
             has_answered = True,
             election = self.election,
+            resource_uri = '/api/v2/candidate/1/',
             remote_id = 1
             )
 
@@ -535,6 +536,7 @@ class AnswersTest(CandideitorgTestCase):
         self.assertEquals(candidate.answers.all()[0],answer)
 
     def test_associate_answers(self):
+        # Candidate.objects.all().delete()
         Election.fetch_all_from_api()
         candidate1 = Candidate.objects.get(resource_uri="/api/v2/candidate/1/")
         answer8 = Answer.objects.get(resource_uri="/api/v2/answer/8/")
