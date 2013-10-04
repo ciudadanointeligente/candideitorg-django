@@ -17,6 +17,7 @@ from django.template import Template, Context
 from django.utils.translation import ugettext as _
 import subprocess
 import os
+from django.core.management import call_command
 
 class CandideitorgTestCase(TestCase):
     @classmethod
@@ -832,3 +833,10 @@ class SignalAfterAllTestCase(CandideitorgTestCase):
         Election.fetch_all_from_api()
         #updating
         Election.fetch_all_from_api()
+
+
+class ManagementCommandTestCase(CandideitorgTestCase):
+    def test_call_command(self):
+        self.assertEquals(Election.objects.count(), 0)
+        call_command('update_from_candidator')
+        self.assertEquals(Election.objects.count(), 1)
