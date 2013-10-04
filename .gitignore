@@ -45,3 +45,4 @@ candidator
 start-local-candideitorg.sh
 
 *.sqlite3
+*.sublime-project
