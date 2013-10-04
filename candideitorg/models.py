@@ -113,7 +113,6 @@ class Election(CandideitorgDocument):
                         for uri in dictionary['answers']:
                             dictionary = CandideitorgDocument.get_resource_as_dict(uri)
                             answer = Answer.create_new_from_dict(dictionary,question=question)
-                            print answer
                             for candidate_uri in dictionary["candidates"]:
                                 candidate = Candidate.objects.get(resource_uri=candidate_uri)
                                 question_of_the_answer = answer.question
