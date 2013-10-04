@@ -52,11 +52,16 @@ class CandideitorgDocument(models.Model):
         new_element["remote_id"] = dicti["id"]
 
         new_element.update(kwargs)
-        existing_objects = cls.objects.filter(remote_id=dicti["id"]).count()
+        return cls.get_or_create(dicti, new_element)
+
+    @classmethod
+    def get_or_create(cls, dictified_element, new_element):
+        existing_objects = cls.objects.filter(remote_id=dictified_element["id"]).count()
         if existing_objects > 0:
-            return cls.objects.get(remote_id=dicti["id"])
+            return cls.objects.get(remote_id=dictified_element["id"])
         else:
             return cls.objects.create(**new_element)
+
 
 
 
@@ -67,6 +72,18 @@ class Election(CandideitorgDocument):
     logo = models.CharField(max_length=255, null=True)
     use_default_media_naranja_option = models.BooleanField(default=False)
     slug = models.SlugField(max_length=255)
+
+    @classmethod
+    def get_or_create(cls, dictified_element, new_element):
+        existing_objects = cls.objects.filter(remote_id=dictified_element["id"]).count()
+        created = True
+        if existing_objects > 0:
+            election = cls.objects.get(remote_id=dictified_element["id"])
+            created = False
+        else:
+            election = cls.objects.create(**new_element)
+        election_finished.send(sender=Election, instance=election, created=created)
+        return election
 
     @classmethod
     def fetch_all_from_api(cls):
@@ -120,7 +137,7 @@ class Election(CandideitorgDocument):
                                 candidate.answers.add(answer)
                                 candidate.save()
 
-                election_finished.send(sender=election)
+                
             offset = meta["offset"] + meta["limit"]
             limit = meta["limit"] 
             if not meta["next"]:
