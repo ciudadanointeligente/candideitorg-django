@@ -786,10 +786,13 @@ class MethodCallLogger(object):
    def __init__(self, method):
      self.method = method
      self.was_called = False
+     self.times = 0
 
    def __call__(self, sender=None, **kwargs):
+     self.times += 1
      self.method(sender, **kwargs)
      self.was_called = True
+     
 
 class SignalAfterAllTestCase(CandideitorgTestCase):
     def setUp(self):
@@ -798,8 +801,11 @@ class SignalAfterAllTestCase(CandideitorgTestCase):
     def test_a_signal_is_called(self):
 
         #defining the receiver
-        def signal_receiver(sender, **kwargs):
-            self.assertIsInstance(sender, Election)
+        def signal_receiver(sender, instance, created, **kwargs):
+            self.assertIsInstance(instance, Election)
+            self.assertEquals(sender, Election)
+            self.assertTrue(created)
+
 
         signal_receiver = MethodCallLogger(signal_receiver)
         #connecting the thing
@@ -808,3 +814,21 @@ class SignalAfterAllTestCase(CandideitorgTestCase):
         Election.fetch_all_from_api()
 
         self.assertTrue(signal_receiver.was_called)
+        self.assertEquals(signal_receiver.times, 1)
+
+    def test_it_send_created_parameter_depending_for_updating(self):
+        #defining the receiver
+        def signal_receiver(sender, instance, created, **kwargs):
+            if signal_receiver.times == 1:
+                self.assertTrue(created)
+            if signal_receiver.times == 2:
+                self.assertFalse(created)
+
+
+        signal_receiver = MethodCallLogger(signal_receiver)
+        #connecting the thing
+        election_finished.connect(signal_receiver)
+        #creating
+        Election.fetch_all_from_api()
+        #updating
+        Election.fetch_all_from_api()
