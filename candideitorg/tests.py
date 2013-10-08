@@ -53,6 +53,7 @@ class UpdatingDataCandidator(CandideitorgTestCase):
         self.assertEquals(BackgroundCategory.objects.count(),2)
 
     def test_updates_answer(self):
+        UpdatingDataCandidator.install_candidator_yaml()
         Election.fetch_all_from_api()
 
         UpdatingDataCandidator.install_candidator_yaml(yaml_file='candidator_example_data_with_answers2')
@@ -65,8 +66,7 @@ class UpdatingDataCandidator(CandideitorgTestCase):
         marchas = Question.objects.get(question='Le gusta ir a las marchas?')
         carretear = Question.objects.get(question='Quiere gastar su plata carreteando?')
         plata = Question.objects.get(question='Quiere robarse la plata del CEI?')
-        
-        print juanito.answers
+
         self.assertEquals(juanito.answers.get(question=paros).caption, u'Si, la llevan')
         self.assertEquals(juanito.answers.get(question=marchas).caption, u'Siempre')
         self.assertEquals(juanito.answers.get(question=carretear).caption, u'A veces')
