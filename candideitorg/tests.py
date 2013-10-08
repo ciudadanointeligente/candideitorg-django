@@ -66,11 +66,36 @@ class UpdatingDataCandidator(CandideitorgTestCase):
         carretear = Question.objects.get(question='Quiere gastar su plata carreteando?')
         plata = Question.objects.get(question='Quiere robarse la plata del CEI?')
         
-
+        print juanito.answers
         self.assertEquals(juanito.answers.get(question=paros).caption, u'Si, la llevan')
         self.assertEquals(juanito.answers.get(question=marchas).caption, u'Siempre')
         self.assertEquals(juanito.answers.get(question=carretear).caption, u'A veces')
         self.assertEquals(juanito.answers.get(question=plata).caption, u'No')
+
+
+    def test_election_update(self):
+        Election.fetch_all_from_api()
+
+        UpdatingDataCandidator.install_candidator_yaml(yaml_file='candidator_example_data_with_answers2')
+
+        election = Election.objects.all()[0]
+        election.update()
+
+        juanito = Candidate.objects.all()[0]
+        
+        paros = Question.objects.get(question='Esta de a cuerdo con los paros?')
+        self.assertEquals(juanito.answers.get(question=paros).caption, u'Si, la llevan')
+        
+        marchas = Question.objects.get(question='Le gusta ir a las marchas?')
+        self.assertEquals(juanito.answers.get(question=marchas).caption, u'Siempre')
+        
+        carretear = Question.objects.get(question='Quiere gastar su plata carreteando?')
+        self.assertEquals(juanito.answers.get(question=carretear).caption, u'A veces')
+        
+        plata = Question.objects.get(question='Quiere robarse la plata del CEI?')
+        self.assertEquals(juanito.answers.get(question=plata).caption, u'No')
+
+
 
 class CandideitorgDocumentTest(TestCase):
     
@@ -840,3 +865,13 @@ class ManagementCommandTestCase(CandideitorgTestCase):
         self.assertEquals(Election.objects.count(), 0)
         call_command('update_from_candidator')
         self.assertEquals(Election.objects.count(), 1)
+
+
+class ElectionFetchAllFromAPIPagination(CandideitorgTestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.install_candidator_yaml(yaml_file="candidator_example_data_big")\
+
+    def test_it_gets_only_the_first_5_elections(self):
+        Election.fetch_all_from_api(max_elections=5, offset=0)
+        self.assertEquals(Election.objects.count(), 5)
