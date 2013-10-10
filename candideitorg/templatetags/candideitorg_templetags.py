@@ -20,6 +20,20 @@ def answer_for_candidate_and_question(candidate, question):
     return _(u"Aún no hay respuesta")
 
 @register.simple_tag
+def get_information_source(candidate, question):
+    '''
+    Returns the answer for the given candidate and question pair.
+
+    >> {% answer_for_candidate_and_question candidate question %}
+    "answer"
+    '''
+    try:
+        information_source = question.informationsource_set.get(candidate=candidate)
+        return information_source.content
+    except:
+        pass
+
+@register.simple_tag
 def relation_personal_data_candidate(candidate, personaldata):
     try:
         return personaldata.personaldatacandidate_set.get(candidate=candidate).value
