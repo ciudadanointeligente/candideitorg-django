@@ -20,8 +20,7 @@ if [ "$CURRENT_DATA" != "$YAML_FILE_NAME" ]
 then
 	echo "$CURRENT_DATA y $YAML_FILE_NAME no son iguales";
 	echo "$YAML_FILE_NAME" > current_data.txt;
-	python manage.py reset_db --router=default --noinput;
-	python manage.py syncdb --noinput;
+	python manage.py sqlreset elections|python manage.py dbshell
 	python manage.py loaddata $YAML_FILE_NAME;
 	
 else

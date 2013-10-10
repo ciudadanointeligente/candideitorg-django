@@ -73,6 +73,9 @@ class Election(CandideitorgDocument):
     use_default_media_naranja_option = models.BooleanField(default=False)
     slug = models.SlugField(max_length=255)
 
+    def __unicode__(self):
+        return self.name
+
     @classmethod
     def get_or_create(cls, dictified_element, new_element):
         existing_objects = cls.objects.filter(remote_id=dictified_element["id"]).count()
@@ -120,9 +123,10 @@ class Election(CandideitorgDocument):
             dictionary = CandideitorgDocument.get_resource_as_dict(uri)
             category = Category.create_new_from_dict(dictionary, election=election)
             for uri in dictionary['questions']:
-                dictionary = CandideitorgDocument.get_resource_as_dict(uri)
-                question = Question.create_new_from_dict(dictionary, category=category)
-                for uri in dictionary['answers']:
+                question_dictionary = CandideitorgDocument.get_resource_as_dict(uri)
+
+                question = Question.create_new_from_dict(question_dictionary, category=category)
+                for uri in question_dictionary['answers']:
                     dictionary = CandideitorgDocument.get_resource_as_dict(uri)
                     answer = Answer.create_new_from_dict(dictionary,question=question)
                     for candidate_uri in dictionary["candidates"]:
@@ -131,6 +135,11 @@ class Election(CandideitorgDocument):
                         candidate.answers.filter(question=question_of_the_answer).delete()
                         candidate.answers.add(answer)
                         candidate.save()
+
+                for uri in question_dictionary['information_sources']:
+                    dictionary = CandideitorgDocument.get_resource_as_dict(uri)
+                    candidate = Candidate.objects.get(resource_uri=dictionary['candidate'])
+                    information_source = InformationSource.create_new_from_dict(dictionary, question=question, candidate=candidate)
 
     @classmethod
     def fetch_all_from_api(cls,offset=0, max_elections=None):
@@ -169,6 +178,9 @@ class Candidate(CandideitorgDocument):
     election = models.ForeignKey(Election)
     answers = models.ManyToManyField('Answer')
 
+    def __unicode__(self):
+        return self.name
+
 
 class BackgroundCategory(CandideitorgDocument):
     election = models.ForeignKey(Election)
@@ -196,6 +208,12 @@ class Answer(CandideitorgDocument):
 class Question(CandideitorgDocument):
     question = models.CharField(max_length=255)
     category = models.ForeignKey(Category)
+class InformationSource(CandideitorgDocument):
+    question = models.ForeignKey(Question)
+    candidate = models.ForeignKey(Candidate)
+    content = models.TextField()
+
+
 
 class PersonalDataCandidate(CandideitorgDocument):
     value = models.CharField(max_length=255, null=True)

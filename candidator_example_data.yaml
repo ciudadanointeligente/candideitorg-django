@@ -91,6 +91,9 @@
 - fields: {category: 1, question: 'Esta de a cuerdo con los paros?'}
   model: elections.question
   pk: 1
+- fields: {question: 1, candidate: 1, content: 'Esta de a cuerdo con los paros?'}
+  model: elections.informationsource
+  pk: 1
 - fields: {category: 1, question: 'Le gusta ir a las marchas?'}
   model: elections.question
   pk: 2

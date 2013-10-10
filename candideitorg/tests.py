@@ -10,7 +10,7 @@ from django.test import TestCase
 import slumber
 from candideitorg.models import CandideitorgDocument, Election, Category, Candidate, BackgroundCategory,\
                                 PersonalData, Background, Answer, Question, PersonalDataCandidate, Link,\
-                                BackgroundCandidate
+                                BackgroundCandidate, InformationSource
 from django.core.management import call_command
 from django.utils.unittest import skip
 from django.template import Template, Context
@@ -244,6 +244,19 @@ class ElectionTest(CandideitorgTestCase):
         self.assertEquals(election.slug, 'cei-2012')
         self.assertTrue(election.use_default_media_naranja_option)
 
+    def test_unicode(self):
+        election = Election.objects.create(
+            description = "Elecciones CEI 2012",
+            remote_id = 1,
+            information_source = "",
+            logo = "/media/photos/dummy.jpg",
+            name = "cei 2012",
+            resource_uri = "/api/v2/election/1/",
+            slug = "cei-2012",
+            use_default_media_naranja_option = True
+            )
+        self.assertEquals(election.__unicode__(), "cei 2012")
+
     def test_fetch_all_election(self):
         Election.fetch_all_from_api()
         self.assertEquals(Election.objects.count(), 1)
@@ -337,6 +350,17 @@ class CandidatesTest(CandideitorgTestCase):
         self.assertTrue(candidate.has_answered)
         self.assertEquals(candidate.election, self.election)
 
+    def test_unicode(self):
+        candidate = Candidate.objects.create(
+            name = "Juanito Perez",
+            photo = "/media/photos/dummy.jpg",
+            slug = "juanito-perez",
+            has_answered = True,
+            election = self.election,
+            remote_id = 1
+            )
+        self.assertEquals(candidate.__unicode__(),u"Juanito Perez")
+
     def test_fetch_all_candidates_from_api(self):
         self.election.delete()
         Election.fetch_all_from_api()
@@ -350,6 +374,70 @@ class CandidatesTest(CandideitorgTestCase):
         self.assertEquals(candidate.slug, 'juanito-perez')
         self.assertEquals(candidate.photo, '/media/photos/dummy.jpg')
         self.assertEquals(candidate.election, election)
+class InformationSourceTest(CandideitorgTestCase):
+    def setUp(self):
+        super(InformationSourceTest, self).setUp()
+        
+
+    def test_i_can_create_one(self):
+        self.election = Election.objects.create(
+            description = "Elecciones CEI 2012",
+            remote_id = 1,
+            information_source = "",
+            logo = "/media/photos/dummy.jpg",
+            name = "cei 2012",
+            resource_uri = "/api/v2/election/1/",
+            slug = "cei-2012",
+            use_default_media_naranja_option = True
+            )
+        self.candidate = Candidate.objects.create(
+            name = "Juanito Perez",
+            photo = "/media/photos/dummy.jpg",
+            slug = "juanito-perez",
+            has_answered = True,
+            election = self.election,
+            resource_uri = '/api/v2/candidate/1/',
+            remote_id = 1
+            )
+        self.category = Category.objects.create(
+            name='category name',
+            election=self.election,
+            slug='category-name',
+            order=1,
+            resource_uri='/api/v2/category/1/',
+            remote_id=1
+            )
+        self.question = Question.objects.create(
+            remote_id = 1,
+            question = 'Esta de a cuerdo con los paros?',
+            resource_uri = '/api/v2/question/1/',
+            category = self.category,
+            )
+
+
+
+        information_source = InformationSource.objects.create(
+            question=self.question, 
+            candidate=self.candidate,
+            content="this is a content",
+            remote_id = 1,
+            )
+        self.assertTrue(information_source)
+        self.assertEquals(information_source.question, self.question)
+        self.assertEquals(information_source.candidate, self.candidate)
+        self.assertEquals(information_source.content, "this is a content")
+
+
+    def test_pull_from_api_and_relates(self):
+        Election.fetch_all_from_api()
+
+        candidate = Candidate.objects.get(resource_uri="/api/v2/candidate/1/")
+        question = Question.objects.get(resource_uri="/api/v2/question/1/")
+
+        information_source = InformationSource.objects.all()[0]
+        self.assertEquals(information_source.candidate, candidate)
+        self.assertEquals(information_source.question, question)
+        self.assertEquals(information_source.content, u'Esta de a cuerdo con los paros?')
 
 class BackgroundCategoriesTest(CandideitorgTestCase):
     def setUp(self):
