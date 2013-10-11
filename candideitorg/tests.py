@@ -41,6 +41,7 @@ class CandideitorgMoreThanTwentyElections(CandideitorgTestCase):
 
 
 class UpdatingDataCandidator(CandideitorgTestCase):
+
     def test_upgrade_data(self):
         Election.fetch_all_from_api()
         Election.fetch_all_from_api()
@@ -67,10 +68,13 @@ class UpdatingDataCandidator(CandideitorgTestCase):
         carretear = Question.objects.get(question='Quiere gastar su plata carreteando?')
         plata = Question.objects.get(question='Quiere robarse la plata del CEI?')
 
-        self.assertEquals(juanito.answers.get(question=paros).caption, u'Si, la llevan')
+        self.assertEquals(juanito.answers.get(question=paros).caption, u'Estoy de acuerdo con algunos paros')
         self.assertEquals(juanito.answers.get(question=marchas).caption, u'Siempre')
-        self.assertEquals(juanito.answers.get(question=carretear).caption, u'A veces')
         self.assertEquals(juanito.answers.get(question=plata).caption, u'No')
+        self.assertEquals(juanito.answers.get(question=carretear).caption, u'A veces')
+        
+
+
 
 
     def test_election_update(self):
@@ -84,8 +88,7 @@ class UpdatingDataCandidator(CandideitorgTestCase):
         juanito = Candidate.objects.all()[0]
         self.assertEquals(juanito.answers.all().count(), 4)
         
-        paros = Question.objects.get(question='Esta de a cuerdo con los paros?')
-        self.assertEquals(juanito.answers.get(question=paros).caption, u'Si, la llevan')
+        
         
         marchas = Question.objects.get(question='Le gusta ir a las marchas?')
         self.assertEquals(juanito.answers.get(question=marchas).caption, u'Siempre')
@@ -95,6 +98,9 @@ class UpdatingDataCandidator(CandideitorgTestCase):
         
         plata = Question.objects.get(question='Quiere robarse la plata del CEI?')
         self.assertEquals(juanito.answers.get(question=plata).caption, u'No')
+
+        paros = Question.objects.get(question='Esta de a cuerdo con los paros?')
+        self.assertEquals(juanito.answers.get(question=paros).caption, u'Estoy de acuerdo con algunos paros')
 
     def test_election_update_answers(self):
         Election.fetch_all_from_api()
@@ -106,10 +112,11 @@ class UpdatingDataCandidator(CandideitorgTestCase):
 
 
         juanito = Candidate.objects.all()[0]
+
         self.assertEquals(juanito.answers.all().count(), 4)
         
         paros = Question.objects.get(question='Esta de a cuerdo con los paros?')
-        self.assertEquals(juanito.answers.get(question=paros).caption, u'Si, la llevan')
+        self.assertEquals(juanito.answers.get(question=paros).caption, u'Estoy de acuerdo con algunos paros')
         
         marchas = Question.objects.get(question='Le gusta ir a las marchas?')
         self.assertEquals(juanito.answers.get(question=marchas).caption, u'Siempre')
