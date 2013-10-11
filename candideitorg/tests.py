@@ -17,6 +17,7 @@ from django.template import Template, Context
 from django.utils.translation import ugettext as _
 import subprocess
 import os
+from django.template.loader import get_template
 from django.core.management import call_command
 
 class CandideitorgTestCase(TestCase):
@@ -800,8 +801,9 @@ class TemplateTagsTest(CandideitorgTestCase):
 
         template = Template("{% load candideitorg_templetags %}{% get_information_source candidate question %}")
         context = Context({'candidate':candidate,'question':question})
-
-        self.assertEquals(template.render(context),'olinwi')
+        htmly     = get_template('candideitorg/information_source.html')
+        html_content = htmly.render(Context({'information_source': information_source}))
+        self.assertEquals(template.render(context),html_content)
 
     def test_get_empty_information_source(self):
         candidate = Candidate.objects.get(resource_uri="/api/v2/candidate/1/")

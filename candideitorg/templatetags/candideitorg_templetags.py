@@ -19,7 +19,7 @@ def answer_for_candidate_and_question(candidate, question):
         pass
     return _(u"Aún no hay respuesta")
 
-@register.simple_tag
+@register.inclusion_tag('candideitorg/information_source.html')
 def get_information_source(candidate, question):
     '''
     Returns the information source for a candidate referred to a certain question.
@@ -29,9 +29,9 @@ def get_information_source(candidate, question):
     '''
     try:
         information_source = question.informationsource_set.get(candidate=candidate)
-        return information_source.content
+        return {'information_source':information_source}
     except:
-        return ''
+        return {'information_source':None}
 
 @register.simple_tag
 def relation_personal_data_candidate(candidate, personaldata):
