@@ -803,6 +803,16 @@ class TemplateTagsTest(CandideitorgTestCase):
 
         self.assertEquals(template.render(context),'olinwi')
 
+    def test_get_empty_information_source(self):
+        candidate = Candidate.objects.get(resource_uri="/api/v2/candidate/1/")
+        question = Question.objects.get(resource_uri="/api/v2/question/2/")
+        #I will not create any information_source
+    
+        template = Template("{% load candideitorg_templetags %}{% get_information_source candidate question %}")
+        context = Context({'candidate':candidate,'question':question})
+
+        self.assertFalse(template.render(context))
+
 class PersonalDataCandidateTest(CandideitorgTestCase):
     def setUp(self):
         super(PersonalDataCandidateTest, self).setUp()
