@@ -88,6 +88,25 @@ class Election(CandideitorgDocument):
         
         return election, created
 
+    def update_answers(self):
+        candidates = Candidate.objects.filter(election=self)
+        for candidate in candidates:
+            candidate_dictionary = CandideitorgDocument.get_resource_as_dict(candidate.resource_uri)
+            new_answers = []
+            for answer_uri in candidate_dictionary['answers']:
+                try:
+                    answer = Answer.objects.get(resource_uri=answer_uri)
+                    question = answer.question
+                    #candidate.answers.filter(question=question).delete()
+                    new_answers.append(answer)
+
+                except:
+                    pass
+
+        questions = Question.objects.filter(category__election=self)
+        for question in questions:
+            question_dictionary = CandideitorgDocument.get_resource_as_dict(question.resource_uri)
+
     def update(self):
         api = self.__class__.get_api()
         election_dict = api.election(self.remote_id).get()
@@ -123,16 +142,16 @@ class Election(CandideitorgDocument):
             dictionary = CandideitorgDocument.get_resource_as_dict(uri)
             category = Category.create_new_from_dict(dictionary, election=election)
             for uri in dictionary['questions']:
-                question_dictionary = CandideitorgDocument.get_resource_as_dict(uri)
 
+                question_dictionary = CandideitorgDocument.get_resource_as_dict(uri)
                 question = Question.create_new_from_dict(question_dictionary, category=category)
                 for uri in question_dictionary['answers']:
                     dictionary = CandideitorgDocument.get_resource_as_dict(uri)
                     answer = Answer.create_new_from_dict(dictionary,question=question)
+                    answer.candidate_set.clear()
                     for candidate_uri in dictionary["candidates"]:
                         candidate = Candidate.objects.get(resource_uri=candidate_uri)
                         question_of_the_answer = answer.question
-                        candidate.answers.filter(question=question_of_the_answer).delete()
                         candidate.answers.add(answer)
                         candidate.save()
 

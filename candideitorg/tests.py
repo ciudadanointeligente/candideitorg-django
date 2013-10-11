@@ -41,6 +41,7 @@ class CandideitorgMoreThanTwentyElections(CandideitorgTestCase):
 
 
 class UpdatingDataCandidator(CandideitorgTestCase):
+
     def test_upgrade_data(self):
         Election.fetch_all_from_api()
         Election.fetch_all_from_api()
@@ -67,10 +68,13 @@ class UpdatingDataCandidator(CandideitorgTestCase):
         carretear = Question.objects.get(question='Quiere gastar su plata carreteando?')
         plata = Question.objects.get(question='Quiere robarse la plata del CEI?')
 
-        self.assertEquals(juanito.answers.get(question=paros).caption, u'Si, la llevan')
+        self.assertEquals(juanito.answers.get(question=paros).caption, u'Estoy de acuerdo con algunos paros')
         self.assertEquals(juanito.answers.get(question=marchas).caption, u'Siempre')
-        self.assertEquals(juanito.answers.get(question=carretear).caption, u'A veces')
         self.assertEquals(juanito.answers.get(question=plata).caption, u'No')
+        self.assertEquals(juanito.answers.get(question=carretear).caption, u'A veces')
+        
+
+
 
 
     def test_election_update(self):
@@ -82,9 +86,9 @@ class UpdatingDataCandidator(CandideitorgTestCase):
         election.update()
 
         juanito = Candidate.objects.all()[0]
+        self.assertEquals(juanito.answers.all().count(), 4)
         
-        paros = Question.objects.get(question='Esta de a cuerdo con los paros?')
-        self.assertEquals(juanito.answers.get(question=paros).caption, u'Si, la llevan')
+        
         
         marchas = Question.objects.get(question='Le gusta ir a las marchas?')
         self.assertEquals(juanito.answers.get(question=marchas).caption, u'Siempre')
@@ -94,6 +98,47 @@ class UpdatingDataCandidator(CandideitorgTestCase):
         
         plata = Question.objects.get(question='Quiere robarse la plata del CEI?')
         self.assertEquals(juanito.answers.get(question=plata).caption, u'No')
+
+        paros = Question.objects.get(question='Esta de a cuerdo con los paros?')
+        self.assertEquals(juanito.answers.get(question=paros).caption, u'Estoy de acuerdo con algunos paros')
+
+    def test_election_update_answers(self):
+        Election.fetch_all_from_api()
+        juanito = Candidate.objects.all()[0]
+        
+        UpdatingDataCandidator.install_candidator_yaml(yaml_file='candidator_example_data_with_answers2')
+        election = Election.objects.all()[0]
+        election.update_answers()
+
+
+        juanito = Candidate.objects.all()[0]
+
+        self.assertEquals(juanito.answers.all().count(), 4)
+        
+        paros = Question.objects.get(question='Esta de a cuerdo con los paros?')
+        self.assertEquals(juanito.answers.get(question=paros).caption, u'Estoy de acuerdo con algunos paros')
+        
+        marchas = Question.objects.get(question='Le gusta ir a las marchas?')
+        self.assertEquals(juanito.answers.get(question=marchas).caption, u'Siempre')
+        
+        carretear = Question.objects.get(question='Quiere gastar su plata carreteando?')
+        self.assertEquals(juanito.answers.get(question=carretear).caption, u'A veces')
+        
+        plata = Question.objects.get(question='Quiere robarse la plata del CEI?')
+        self.assertEquals(juanito.answers.get(question=plata).caption, u'No')
+        #print juanito.answers.all()
+        # election = Election.objects.all()[0]
+        # questions = Question.objects.filter(category__election=election)
+        # print questions
+        # 
+
+
+        # election.update_answers()
+        # juanito = Candidate.objects.all()[0]
+        # self.assertEquals(juanito.answers.all().count(), 4)
+        # self.fail()
+
+
 
 
 
@@ -712,6 +757,7 @@ class TemplateTagsTest(CandideitorgTestCase):
         question = Question.objects.get(resource_uri="/api/v2/question/2/")
         candidate = Candidate.objects.get(resource_uri="/api/v2/candidate/1/")
         answer = Answer.objects.get(resource_uri="/api/v2/answer/8/")
+
         expected_html = answer.caption
 
         template = Template("{% load candideitorg_templetags %}{% answer_for_candidate_and_question candidate question %}")
@@ -723,6 +769,9 @@ class TemplateTagsTest(CandideitorgTestCase):
         candidate = Candidate.objects.get(resource_uri="/api/v2/candidate/1/")
         question = Question.objects.get(resource_uri="/api/v2/question/3/")
         #No one has answered the question 3
+        candidate.answers.all().delete()
+        #No one has answered the question 3
+
         expected_html = _(u"Aún no hay respuesta")
         template = Template("{% load candideitorg_templetags %}{% answer_for_candidate_and_question candidate question %}")
         context = Context({'candidate':candidate,'question':question})
@@ -740,6 +789,19 @@ class TemplateTagsTest(CandideitorgTestCase):
         context = Context({'candidate':candidate,'personal_data':personal_data})
 
         self.assertEquals(template.render(context),expected_html)
+
+    def test_information_source(self):
+        candidate = Candidate.objects.get(resource_uri="/api/v2/candidate/1/")
+        question = Question.objects.get(resource_uri="/api/v2/question/1/")
+        information_source, created = InformationSource.objects.get_or_create(question=question, candidate=candidate, remote_id=1)
+    
+        information_source.content = 'olinwi'
+        information_source.save()
+
+        template = Template("{% load candideitorg_templetags %}{% get_information_source candidate question %}")
+        context = Context({'candidate':candidate,'question':question})
+
+        self.assertEquals(template.render(context),'olinwi')
 
 class PersonalDataCandidateTest(CandideitorgTestCase):
     def setUp(self):
