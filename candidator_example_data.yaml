@@ -5,7 +5,7 @@
   model: elections.election
   pk: 1
 - fields:
-    answers: [8]
+    answers: [8, 10, 5, 2]
     created_at: 2011-11-10 16:34:30
     election: 1
     has_answered: true
