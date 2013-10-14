@@ -110,6 +110,21 @@ class Election(CandideitorgDocument):
 
 
                 answer.candidate_set = new_candidates
+            #Getting the information sources
+            for information_source_uri in question_dictionary['information_sources']:
+                information_dictionary = CandideitorgDocument.get_resource_as_dict(information_source_uri)
+                try:
+                    information_source = InformationSource.objects.get(resource_uri=information_source_uri)
+                    information_source.content = information_dictionary['content']
+                    information_source.save()
+                except InformationSource.DoesNotExist, error:
+                    #I have to create it with something like this 
+                    # information_source = InformationSource.create_new_from_dict(dictionary, question=question, candidate=candidate)
+                    candidate = Candidate.objects.get(resource_uri=information_dictionary['candidate'])
+                    information_source = InformationSource.create_new_from_dict(information_dictionary, question=question, candidate=candidate)
+
+
+
 
 
 

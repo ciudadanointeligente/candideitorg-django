@@ -163,3 +163,9 @@
 - fields: {caption: 'Estoy de acuerdo con algunos paros', question: 1}
   model: elections.answer
   pk: 11
+- fields: {question: 1, candidate: 1, content: 'En el diario más cercano'}
+  model: elections.informationsource
+  pk: 1
+- fields: {question: 1, candidate: 2, content: 'this IS did not exist before'}
+  model: elections.informationsource
+  pk: 2

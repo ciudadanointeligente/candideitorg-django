@@ -19,6 +19,7 @@ import subprocess
 import os
 from django.template.loader import get_template
 from django.core.management import call_command
+from django.db.models import Q
 
 class CandideitorgTestCase(TestCase):
     @classmethod
@@ -128,7 +129,14 @@ class UpdatingDataCandidator(CandideitorgTestCase):
         plata = Question.objects.get(question='Quiere robarse la plata del CEI?')
         self.assertEquals(juanito.answers.get(question=plata).caption, u'No')
 
-        #
+        #now test with new information source
+        information_source = InformationSource.objects.get(Q(question=paros) & Q(candidate=juanito))
+        self.assertEquals(information_source.content, u'En el diario más cercano')
+
+
+        tester = Candidate.objects.get(resource_uri='/api/v2/candidate/2/')
+        information_source2 = InformationSource.objects.get(Q(question=paros) & Q(candidate=tester))
+        self.assertEquals(information_source2.content, u'this IS did not exist before')
 
 
 class CandideitorgDocumentTest(TestCase):
