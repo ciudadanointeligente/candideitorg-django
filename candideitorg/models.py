@@ -89,23 +89,31 @@ class Election(CandideitorgDocument):
         return election, created
 
     def update_answers(self):
-        candidates = Candidate.objects.filter(election=self)
-        for candidate in candidates:
-            candidate_dictionary = CandideitorgDocument.get_resource_as_dict(candidate.resource_uri)
-            new_answers = []
-            for answer_uri in candidate_dictionary['answers']:
-                try:
-                    answer = Answer.objects.get(resource_uri=answer_uri)
-                    question = answer.question
-                    #candidate.answers.filter(question=question).delete()
-                    new_answers.append(answer)
-
-                except:
-                    pass
-
         questions = Question.objects.filter(category__election=self)
         for question in questions:
             question_dictionary = CandideitorgDocument.get_resource_as_dict(question.resource_uri)
+            question = Question.objects.get(resource_uri=question_dictionary['resource_uri'])
+            for answer_uri in question_dictionary['answers']:
+                answer_dictionary = CandideitorgDocument.get_resource_as_dict(answer_uri)
+
+                answer = Answer.create_new_from_dict(answer_dictionary,question=question)
+
+
+                if answer.candidate_set.all():
+                    answer.candidate_set.clear()
+
+                new_candidates = []
+
+                for candidate_uri in answer_dictionary['candidates']:
+                    candidate = Candidate.objects.get(resource_uri=candidate_uri)
+                    new_candidates.append(candidate)
+
+
+                answer.candidate_set = new_candidates
+
+
+
+
 
     def update(self):
         api = self.__class__.get_api()

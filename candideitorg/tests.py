@@ -127,20 +127,8 @@ class UpdatingDataCandidator(CandideitorgTestCase):
         
         plata = Question.objects.get(question='Quiere robarse la plata del CEI?')
         self.assertEquals(juanito.answers.get(question=plata).caption, u'No')
-        #print juanito.answers.all()
-        # election = Election.objects.all()[0]
-        # questions = Question.objects.filter(category__election=election)
-        # print questions
-        # 
 
-
-        # election.update_answers()
-        # juanito = Candidate.objects.all()[0]
-        # self.assertEquals(juanito.answers.all().count(), 4)
-        # self.fail()
-
-
-
+        #
 
 
 class CandideitorgDocumentTest(TestCase):
