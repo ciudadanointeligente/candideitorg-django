@@ -67,7 +67,7 @@ class CandideitorgDocument(models.Model):
 
 class Election(CandideitorgDocument):
     information_source = models.TextField(null=True)
-    description = models.TextField()
+    description = models.TextField(null=True)
     name = models.CharField(max_length=255)
     logo = models.CharField(max_length=255, null=True)
     use_default_media_naranja_option = models.BooleanField(default=False)
