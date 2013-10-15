@@ -5,6 +5,7 @@ from candideitorg.apikey_auth import ApiKeyAuth
 from slumber import url_join, Resource
 from django.conf import settings
 import django.dispatch
+from django.utils.translation import ugettext as _
 
 
 twitter_regexp = re.compile(r"^https?://[^/]*(t\.co|twitter\.com)(/.*|/?)")
@@ -212,6 +213,12 @@ class Category(CandideitorgDocument):
     election = models.ForeignKey(Election)
     slug = models.SlugField(max_length=255)
 
+    def __unicode__(self):
+        return _(u'"%(category)s" in election "%(election)s"') % {
+        "category": self.name,
+        "election": self.election.name
+        }
+
 class Candidate(CandideitorgDocument):
     photo = models.CharField(max_length=255, null=True)
     name = models.CharField(max_length=255)
@@ -250,13 +257,25 @@ class Answer(CandideitorgDocument):
 class Question(CandideitorgDocument):
     question = models.CharField(max_length=255)
     category = models.ForeignKey(Category)
+
+    def __unicode__(self):
+        return _(u'"%(question)s" in category "%(category)s", in election "%(election)s"') % {
+        'question': self.question,
+        'category': self.category.name,
+        'election': self.category.election.name
+        }
+
 class InformationSource(CandideitorgDocument):
     question = models.ForeignKey(Question)
     candidate = models.ForeignKey(Candidate)
     content = models.TextField()
 
+    def __unicode__(self):
+        return _(u'Reference for "%(candidate)s" in question "%(question)s"') % {
+        'question':self.question.question,
+        'candidate':self.candidate.name
 
-
+        }
 class PersonalDataCandidate(CandideitorgDocument):
     value = models.CharField(max_length=255, null=True)
     candidate = models.ForeignKey(Candidate)

@@ -346,6 +346,32 @@ class CategoryTest(CandideitorgTestCase):
         self.assertEquals(category.slug, 'category-name')
         self.assertEquals(category.order, 1)
 
+
+    def test_unicode(self):
+        election = Election.objects.create(
+            description = "Elecciones CEI 2012",
+            remote_id = 1,
+            information_source = "",
+            logo = "/media/photos/dummy.jpg",
+            name = "cei 2012",
+            resource_uri = "/api/v2/election/1/",
+            slug = "cei-2012",
+            use_default_media_naranja_option = True
+            )
+
+        category = Category.objects.create(
+            name='category name',
+            election=election,
+            slug='category-name',
+            order=1,
+            resource_uri='/api/v2/category/1/',
+            remote_id=1
+            )
+
+        expected_unicode = '"category name" in election "cei 2012"'
+
+        self.assertEquals(category.__unicode__(), expected_unicode)
+
     def test_fetch_all_categories(self):
         Election.fetch_all_from_api()
         election = Election.objects.all()[0]
@@ -416,12 +442,11 @@ class CandidatesTest(CandideitorgTestCase):
         self.assertEquals(candidate.slug, 'juanito-perez')
         self.assertEquals(candidate.photo, '/media/photos/dummy.jpg')
         self.assertEquals(candidate.election, election)
+
+
 class InformationSourceTest(CandideitorgTestCase):
     def setUp(self):
         super(InformationSourceTest, self).setUp()
-        
-
-    def test_i_can_create_one(self):
         self.election = Election.objects.create(
             description = "Elecciones CEI 2012",
             remote_id = 1,
@@ -455,9 +480,9 @@ class InformationSourceTest(CandideitorgTestCase):
             resource_uri = '/api/v2/question/1/',
             category = self.category,
             )
+        
 
-
-
+    def test_i_can_create_one(self):
         information_source = InformationSource.objects.create(
             question=self.question, 
             candidate=self.candidate,
@@ -480,6 +505,17 @@ class InformationSourceTest(CandideitorgTestCase):
         self.assertEquals(information_source.candidate, candidate)
         self.assertEquals(information_source.question, question)
         self.assertEquals(information_source.content, u'Esta de a cuerdo con los paros?')
+
+
+    def test_unicode(self):
+        information_source = InformationSource.objects.create(
+            question=self.question, 
+            candidate=self.candidate,
+            content="this is a content",
+            remote_id = 1,
+            )
+        expected_unicode = u'Reference for "Juanito Perez" in question "Esta de a cuerdo con los paros?"'
+        self.assertEquals(information_source.__unicode__(), expected_unicode)
 
 class BackgroundCategoriesTest(CandideitorgTestCase):
     def setUp(self):
@@ -732,6 +768,18 @@ class QuestionTest(CandideitorgTestCase):
         self.assertIsInstance(question, CandideitorgDocument)
         self.assertEquals(question.question, 'Le gusta ir a las marchas?')
         self.assertEquals(question.resource_uri, '/api/v2/question/2/')
+
+    def test_unicode(self):
+        question = Question.objects.create(
+            remote_id = 1,
+            question = 'Le gusta ir a las marchas?',
+            resource_uri = '/api/v2/question/2/',
+            category = self.category,
+            )
+
+        expected_unicode = u'"Le gusta ir a las marchas?" in category "category name", in election "cei 2012"'
+        self.assertEquals(question.__unicode__(), expected_unicode)
+
 
     def test_get_all_question_from_api(self):
         self.election.delete()
