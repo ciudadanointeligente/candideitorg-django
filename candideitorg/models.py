@@ -67,10 +67,10 @@ class CandideitorgDocument(models.Model):
 
 
 class Election(CandideitorgDocument):
-    information_source = models.TextField(null=True)
-    description = models.TextField(null=True)
-    name = models.CharField(max_length=255)
-    logo = models.CharField(max_length=255, null=True)
+    information_source = models.TextField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    name = models.CharField(max_length=255, blank=True)
+    logo = models.CharField(max_length=255, null=True, blank=True)
     use_default_media_naranja_option = models.BooleanField(default=False)
     slug = models.SlugField(max_length=255)
 
@@ -220,12 +220,12 @@ class Category(CandideitorgDocument):
         }
 
 class Candidate(CandideitorgDocument):
-    photo = models.CharField(max_length=255, null=True)
+    photo = models.CharField(max_length=255, null=True, blank=True)
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255)
     has_answered = models.BooleanField()
     election = models.ForeignKey(Election)
-    answers = models.ManyToManyField('Answer')
+    answers = models.ManyToManyField('Answer', null=True, blank=True)
 
     def __unicode__(self):
         return self.name
