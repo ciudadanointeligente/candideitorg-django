@@ -3,7 +3,8 @@ from candideitorg.models import Election as CanElection, Candidate, Category, Qu
 
 class CandidateInline(admin.TabularInline):
     model = Candidate
-    fields = ['name', 'photo', 'answers']
+    fields = ['name', 'photo']
+    # fields = ['name', 'photo', 'answers']
     extra = 0
 
 class CanElectionAdmin(admin.ModelAdmin):
