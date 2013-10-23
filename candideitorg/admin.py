@@ -3,7 +3,7 @@ from candideitorg.models import Election as CanElection, Candidate, Category, Qu
 
 class CandidateInline(admin.TabularInline):
     model = Candidate
-    fields = ['name', 'photo']
+    fields = ['name', 'photo','has_answered',]
     # fields = ['name', 'photo', 'answers']
     extra = 0
 
@@ -11,7 +11,7 @@ class CanElectionAdmin(admin.ModelAdmin):
     inlines = [
         CandidateInline
     ]
-    fields = ['name','description','information_source', 'has_answered',  ]
+    fields = ['name','description','information_source',   ]
     actions = ['update_election_from_candideit']
     def update_election_from_candideit(self, request, queryset):
         for election in queryset:
