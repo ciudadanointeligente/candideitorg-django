@@ -159,6 +159,17 @@ class UpdatingDataCandidator(CandideitorgTestCase):
         information_source2 = InformationSource.objects.get(Q(question=paros) & Q(candidate=tester))
         self.assertEquals(information_source2.content, u'this IS did not exist before')
 
+        personaldata = election.personaldata_set.get(label=u'Profesion')
+        candidate = election.candidate_set.get(name="Juanito Perez")
+
+
+        personal_data_candidates = personaldata.personaldatacandidate_set.filter(candidate=candidate)
+        self.assertEquals(personal_data_candidates.count(), 1)
+        self.assertEquals(personal_data_candidates[0].value, u"Grande")
+
+
+
+
 
 class CandideitorgDocumentTest(TestCase):
     
