@@ -150,6 +150,9 @@ class Election(CandideitorgDocument):
             for uri in candidate_dictionary['personal_data_candidate']:
                 pdc_dictionary = CandideitorgDocument.get_resource_as_dict(uri)
                 personal_data = PersonalData.objects.get(resource_uri=pdc_dictionary["personal_data"])
+                #delete previous
+                PersonalDataCandidate.objects.filter(candidate=candidate, personaldata=personal_data).delete()
+                #delete previous
                 PersonalDataCandidate.create_new_from_dict(pdc_dictionary, 
                     candidate=candidate, 
                     personaldata=personal_data)

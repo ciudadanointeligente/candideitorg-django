@@ -79,7 +79,7 @@
 - fields: {candidate: 1, personal_data: 3, value: ''}
   model: elections.personaldatacandidate
   pk: 5
-- fields: {candidate: 1, personal_data: 4, value: ''}
+- fields: {candidate: 1, personal_data: 4, value: 'algo'}
   model: elections.personaldatacandidate
   pk: 6
 - fields: {election: 1, name: Tendencia Politica}
