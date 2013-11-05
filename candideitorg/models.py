@@ -90,7 +90,25 @@ class Election(CandideitorgDocument):
         return election, created
 
     def update_answers(self):
+        for candidate in self.candidate_set.all():
+            candidate_dictionary = CandideitorgDocument.get_resource_as_dict(candidate.resource_uri)
+            PersonalDataCandidate.objects.filter(candidate=candidate).delete()
+            for uri in candidate_dictionary['personal_data_candidate']:
+
+                pdc_dictionary = CandideitorgDocument.get_resource_as_dict(uri)
+                try:
+                    personaldata = PersonalData.objects.get(resource_uri=pdc_dictionary["personal_data"])
+                    PersonalDataCandidate.create_new_from_dict(pdc_dictionary, 
+                                                            candidate=candidate, 
+                                                            personaldata=personaldata)
+                except:
+                    pass
+
+
+
+
         questions = Question.objects.filter(category__election=self)
+
         for question in questions:
             question_dictionary = CandideitorgDocument.get_resource_as_dict(question.resource_uri)
             question = Question.objects.get(resource_uri=question_dictionary['resource_uri'])
@@ -150,6 +168,9 @@ class Election(CandideitorgDocument):
             for uri in candidate_dictionary['personal_data_candidate']:
                 pdc_dictionary = CandideitorgDocument.get_resource_as_dict(uri)
                 personal_data = PersonalData.objects.get(resource_uri=pdc_dictionary["personal_data"])
+                #delete previous
+                PersonalDataCandidate.objects.filter(candidate=candidate, personaldata=personal_data).delete()
+                #delete previous
                 PersonalDataCandidate.create_new_from_dict(pdc_dictionary, 
                     candidate=candidate, 
                     personaldata=personal_data)

@@ -70,13 +70,13 @@
 - fields: {candidate: 1, personal_data: 1, value: 13/13/13}
   model: elections.personaldatacandidate
   pk: 7
-- fields: {candidate: 1, personal_data: 2, value: Estudiante}
+- fields: {candidate: 1, personal_data: 2, value: Grande}
   model: elections.personaldatacandidate
   pk: 8
 - fields: {candidate: 1, personal_data: 3, value: ''}
   model: elections.personaldatacandidate
   pk: 9
-- fields: {candidate: 1, personal_data: 4, value: ''}
+- fields: {candidate: 1, personal_data: 4, value: 'Lo que sea'}
   model: elections.personaldatacandidate
   pk: 10
 - fields: {election: 1, name: Tendencia Politica}

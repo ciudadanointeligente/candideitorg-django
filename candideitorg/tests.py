@@ -104,6 +104,27 @@ class UpdatingDataCandidator(CandideitorgTestCase):
         paros = Question.objects.get(question='Esta de a cuerdo con los paros?')
         self.assertEquals(juanito.answers.get(question=paros).caption, u'Estoy de acuerdo con algunos paros')
 
+
+    def test_election_does_not_create_two_personal_data_candidates(self):
+        Election.fetch_all_from_api()
+
+        UpdatingDataCandidator.install_candidator_yaml(yaml_file='candidator_example_data_with_answers')
+
+        election = Election.objects.all()[0]
+
+        UpdatingDataCandidator.install_candidator_yaml(yaml_file='candidator_example_data_with_answers2')
+        election.update()
+
+        personaldata = election.personaldata_set.get(label=u'Profesion')
+        candidate = election.candidate_set.get(name="Juanito Perez")
+
+
+        personal_data_candidates = personaldata.personaldatacandidate_set.filter(candidate=candidate)
+        self.assertEquals(personal_data_candidates.count(), 1)
+
+
+
+
     def test_election_update_answers(self):
         Election.fetch_all_from_api()
         juanito = Candidate.objects.all()[0]
@@ -137,6 +158,17 @@ class UpdatingDataCandidator(CandideitorgTestCase):
         tester = Candidate.objects.get(resource_uri='/api/v2/candidate/2/')
         information_source2 = InformationSource.objects.get(Q(question=paros) & Q(candidate=tester))
         self.assertEquals(information_source2.content, u'this IS did not exist before')
+
+        personaldata = election.personaldata_set.get(label=u'Profesion')
+        candidate = election.candidate_set.get(name="Juanito Perez")
+
+
+        personal_data_candidates = personaldata.personaldatacandidate_set.filter(candidate=candidate)
+        self.assertEquals(personal_data_candidates.count(), 1)
+        self.assertEquals(personal_data_candidates[0].value, u"Grande")
+
+
+
 
 
 class CandideitorgDocumentTest(TestCase):
