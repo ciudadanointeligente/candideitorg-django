@@ -1,6 +1,47 @@
 Candideitor Django
 ==================
 
-this is API client of candideit.org for any django project.
+this is an API client for candideit.org usable in any django project.
 
-We haven't enable to automatically run candideitorg for testing but if you run candideitorg server with the data found in db.yml
+#Tests
+
+##Requirements
+-sqlite3
+-mercurial
+-virtualenvwrapper
+
+##Execution
+create local virtual environment
+
+```shell
+mkvirtualenv candideitorg_django
+```
+
+install requirements
+
+```shell
+pip install -r requirements.txt
+```
+
+run script start_local_candideitorg.bash
+
+```shell
+./start_local_candideitorg.bash
+```
+
+run tests
+```shell
+python manage.py test candideitorg
+```
+
+Afterwards you might want to kill the candideitorg process. For that you'll have to find its pid
+
+```shell
+ps aux | grep candideitorg
+```
+
+And then kill it
+
+```shell
+kill <pid of candidaitorg process>
+```
