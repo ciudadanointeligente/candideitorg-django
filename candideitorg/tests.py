@@ -69,12 +69,23 @@ class UpdatingDataCandidator(CandideitorgTestCase):
         marchas = Question.objects.get(question='Le gusta ir a las marchas?')
         carretear = Question.objects.get(question='Quiere gastar su plata carreteando?')
         plata = Question.objects.get(question='Quiere robarse la plata del CEI?')
+        # paros_asnwers = 
+        answers_for_paros = paros.answer_set.all()
+        number_of_answers_for_paros = 0
+        for answer_for_paros in answers_for_paros:
+            number_of_answers_for_paros += answer_for_paros.candidate_set.all().count()
+
+
 
         self.assertEquals(juanito.answers.get(question=paros).caption, u'Estoy de acuerdo con algunos paros')
         self.assertEquals(juanito.answers.get(question=marchas).caption, u'Siempre')
         self.assertEquals(juanito.answers.get(question=plata).caption, u'No')
         self.assertEquals(juanito.answers.get(question=carretear).caption, u'A veces')
+        self.assertEquals(paros.number_of_answers,1)
+        paros.answer_set.all().delete()
+        self.assertEquals(paros.number_of_answers,0)
         
+
 
 
 

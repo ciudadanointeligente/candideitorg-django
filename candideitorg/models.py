@@ -285,6 +285,17 @@ class Question(CandideitorgDocument):
         'category': self.category.name,
         'election': self.category.election.name
         }
+    def _get_number_of_answers_(self):
+        answers = self.answer_set.all()
+        number_of_answers = 0
+        for answer in answers:
+            number_of_answers += answer.candidate_set.all().count()
+        return number_of_answers
+        
+    number_of_answers = property(_get_number_of_answers_)
+
+
+
 
 class InformationSource(CandideitorgDocument):
     question = models.ForeignKey(Question)
