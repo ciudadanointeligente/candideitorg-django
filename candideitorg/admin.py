@@ -1,5 +1,6 @@
 from django.contrib import admin
 from candideitorg.models import Election as CanElection, Candidate, Category, Question, Answer, InformationSource
+from candideitorg.tasks import election_updater
 
 class CandidateInline(admin.TabularInline):
     model = Candidate
@@ -15,7 +16,7 @@ class CanElectionAdmin(admin.ModelAdmin):
     actions = ['update_election_from_candideit']
     def update_election_from_candideit(self, request, queryset):
         for election in queryset:
-            election.update_answers()
+            election_updater.delay(election)
     update_election_from_candideit.short_description = "Actualizar elecciones desde candideitorg"
     
 admin.site.register(CanElection, CanElectionAdmin)
