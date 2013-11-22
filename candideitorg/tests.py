@@ -20,6 +20,7 @@ import os
 from django.template.loader import get_template
 from django.core.management import call_command
 from django.db.models import Q
+from candideitorg.tasks import election_updater
 
 class CandideitorgTestCase(TestCase):
     @classmethod
@@ -114,6 +115,38 @@ class UpdatingDataCandidator(CandideitorgTestCase):
 
         paros = Question.objects.get(question='Esta de a cuerdo con los paros?')
         self.assertEquals(juanito.answers.get(question=paros).caption, u'Estoy de acuerdo con algunos paros')
+
+
+    def test_election_update_with_a_celery_task(self):
+
+        Election.fetch_all_from_api()
+
+        UpdatingDataCandidator.install_candidator_yaml(yaml_file='candidator_example_data_with_answers2')
+
+        election = Election.objects.all()[0]
+
+        result = election_updater.delay(election)
+
+        self.assertTrue(result.successful())
+
+        juanito = Candidate.objects.all()[0]
+        self.assertEquals(juanito.answers.all().count(), 4)
+        
+        
+        
+        marchas = Question.objects.get(question='Le gusta ir a las marchas?')
+        self.assertEquals(juanito.answers.get(question=marchas).caption, u'Siempre')
+        
+        carretear = Question.objects.get(question='Quiere gastar su plata carreteando?')
+        self.assertEquals(juanito.answers.get(question=carretear).caption, u'A veces')
+        
+        plata = Question.objects.get(question='Quiere robarse la plata del CEI?')
+        self.assertEquals(juanito.answers.get(question=plata).caption, u'No')
+
+        paros = Question.objects.get(question='Esta de a cuerdo con los paros?')
+        self.assertEquals(juanito.answers.get(question=paros).caption, u'Estoy de acuerdo con algunos paros')
+
+
 
 
     def test_election_does_not_create_two_personal_data_candidates(self):

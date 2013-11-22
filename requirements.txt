@@ -1,2 +1,4 @@
 Django
 slumber
+celery
+django-celery
