@@ -5,6 +5,7 @@ import os
 
 INSTALLED_APPS = [
     'candideitorg',
+    'djcelery'
 ]
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -19,3 +20,12 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
+import djcelery
+djcelery.setup_loader()
+
+CELERY_ALWAYS_EAGER = True
+
+#CELERY STUFF
+BROKER_URL = 'amqp://guest:guest@localhost:5672/'
+CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
+CELERY_RESULT_BACKEND = "amqp"
