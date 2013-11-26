@@ -147,9 +147,12 @@ class Election(CandideitorgDocument):
 
 
 
-
+    def cleanup_before_updating(self):
+        Candidate.objects.filter(election=self).delete()
+        Question.objects.filter(category__election=self).delete()
 
     def update(self):
+        self.cleanup_before_updating()
         api = self.__class__.get_api()
         election_dict = api.election(self.remote_id).get()
         election, created = Election.create_new_from_dict(election_dict)

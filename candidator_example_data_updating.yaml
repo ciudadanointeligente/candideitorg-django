@@ -1,0 +1,156 @@
+- fields: {created_at: !!timestamp '2011-11-10 16:33:51', custom_style: '', date: '',
+    description: Elecciones CEI 2012, highlighted: true, information_source: '', logo: photos/dummy.jpg,
+    name: cei 2012, owner: 1, published: false, should_display_empty_personal_data: true,
+    slug: cei-2012, updated_at: !!timestamp '2011-11-15 16:55:46', use_default_media_naranja_option: true}
+  model: elections.election
+  pk: 1
+- fields:
+    answers: [18, 20, 15, 12]
+    created_at: 2011-11-10 16:34:30
+    election: 1
+    has_answered: true
+    name: Juanito Perez
+    photo: photos/dummy.jpg
+    slug: juanito-perez
+    updated_at: 2011-11-15 17:06:36
+  model: elections.candidate
+  pk: 4
+- fields:
+    answers: []
+    created_at: 2011-11-10 16:35:03
+    election: 1
+    has_answered: true
+    name: Candidato Tester
+    photo: photos/dummy.jpg
+    slug: candidato-tester
+    updated_at: 2011-11-10 16:35:03
+  model: elections.candidate
+  pk: 5
+- fields:
+    answers: []
+    created_at: 2011-11-10 16:44:56
+    election: 1
+    has_answered: true
+    name: Foo Bar
+    photo: photos/dummy.jpg
+    slug: foo-bar
+    updated_at: 2011-11-10 16:44:56
+  model: elections.candidate
+  pk: 6
+- fields: {election: 1, label: Nacimiento}
+  model: elections.personaldata
+  pk: 1
+- fields: {election: 1, label: Profesion}
+  model: elections.personaldata
+  pk: 2
+- fields: {election: 1, label: "Profesi\xF3n"}
+  model: elections.personaldata
+  pk: 3
+- fields: {election: 1, label: "G\xE9nero"}
+  model: elections.personaldata
+  pk: 4
+- fields: {candidate: 4, personal_data: 1, value: 13/13/13}
+  model: elections.personaldatacandidate
+  pk: 1
+- fields: {candidate: 4, personal_data: 2, value: Estudiante}
+  model: elections.personaldatacandidate
+  pk: 2
+- fields: {election: 1, name: Tendencia Politica}
+  model: elections.backgroundcategory
+  pk: 1
+- fields: {election: 1, name: Educacion}
+  model: elections.backgroundcategory
+  pk: 2
+- fields: {category: 1, name: Partido politico actual}
+  model: elections.background
+  pk: 1
+- fields: {category: 2, name: Secundaria}
+  model: elections.background
+  pk: 2
+- fields: {category: 2, name: Universitaria}
+  model: elections.background
+  pk: 3
+- fields: {category: 2, name: "\xDAltimo trabajo"}
+  model: elections.background
+  pk: 4
+- fields: {background: 1, candidate: 4, value: CCC}
+  model: elections.backgroundcandidate
+  pk: 1
+- fields: {background: 2, candidate: 4, value: Colegio a}
+  model: elections.backgroundcandidate
+  pk: 2
+- fields: {background: 3, candidate: 4, value: Universidad B}
+  model: elections.backgroundcandidate
+  pk: 3
+- fields: {election: 1, name: Politicas Publicas, order: 1, slug: politicas-publicas}
+  model: elections.category
+  pk: 1
+- fields: {election: 1, name: Politicas Monetarias, order: 1, slug: politicas-monetarias}
+  model: elections.category
+  pk: 2
+- fields: {category: 1, question: 'Esta de a cuerdo con los paros?'}
+  model: elections.question
+  pk: 8
+- fields: {question: 1, candidate: 4, content: 'Esta de a cuerdo con los paros?'}
+  model: elections.informationsource
+  pk: 1
+- fields: {category: 1, question: 'Le gusta ir a las marchas?'}
+  model: elections.question
+  pk: 7
+- fields: {category: 2, question: 'Quiere gastar su plata carreteando?'}
+  model: elections.question
+  pk: 6
+- fields: {category: 2, question: 'Quiere robarse la plata del CEI?'}
+  model: elections.question
+  pk: 5
+- fields: {caption: Si11, question: 5}
+  model: elections.answer
+  pk: 11
+- fields: {caption: 'No12', question: 5}
+  model: elections.answer
+  pk: 12
+- fields: {caption: Si13, question: 6}
+  model: elections.answer
+  pk: 13
+- fields: {caption: 'No14', question: 6}
+  model: elections.answer
+  pk: 14
+- fields: {caption: A veces 15, question: 6}
+  model: elections.answer
+  pk: 15
+- fields: {caption: Nunca 16, question: 7}
+  model: elections.answer
+  pk: 16
+- fields: {caption: Siempre 17, question: 7}
+  model: elections.answer
+  pk: 17
+- fields: {caption: De vez en cuando 18, question: 7}
+  model: elections.answer
+  pk: 18
+- fields: {caption: Puro perder clases 19, question: 8}
+  model: elections.answer
+  pk: 19
+- fields: {caption: 'Si, la llevan 20', question: 8}
+  model: elections.answer
+  pk: 20
+- fields:
+    date_joined: 2013-08-23 13:12:42.967417
+    email: admin@admin.cl
+    first_name: ''
+    groups: []
+    is_active: true
+    is_staff: true
+    is_superuser: true
+    last_login: 2013-08-23 13:13:17.956957
+    last_name: ''
+    password: sha1$0e99d$d39fffb9f95042cd8b208d38e2acdefd307ba583
+    user_permissions: []
+    username: admin
+  model: auth.user
+  pk: 1
+- fields: {created: !!timestamp '2013-08-23 13:12:43', key: a, user: 1}
+  model: tastypie.apikey
+  pk: 1
+- fields: {candidate: 6, name: twitter, url: 'http://www.twitter.com'}
+  model: elections.link
+  pk: 1
