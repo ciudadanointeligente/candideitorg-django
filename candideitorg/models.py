@@ -148,7 +148,6 @@ class Election(CandideitorgDocument):
 
 
     def cleanup_before_updating(self):
-        Candidate.objects.filter(election=self).delete()
         Question.objects.filter(category__election=self).delete()
 
     def update(self):

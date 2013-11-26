@@ -228,13 +228,6 @@ class UpdatingDataCandidator(CandideitorgTestCase):
 
         self.assertEquals(answers.count(), 14)
 
-
-        candidates = Candidate.objects.filter(election=election)
-        self.assertEquals(candidates.count(), 3)
-
-
-
-
 class CandideitorgDocumentTest(TestCase):
     
     def setUp(self):
