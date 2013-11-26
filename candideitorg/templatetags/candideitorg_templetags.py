@@ -39,3 +39,10 @@ def relation_personal_data_candidate(candidate, personaldata):
         return personaldata.personaldatacandidate_set.get(candidate=candidate).value
     except:
         return _('no message')
+
+@register.simple_tag
+def relation_background_candidate(candidate, background):
+    try:
+        return background.backgroundcandidate_set.get(candidate=candidate).value
+    except:
+        return _('no message')
