@@ -212,6 +212,26 @@ class UpdatingDataCandidator(CandideitorgTestCase):
         self.assertEquals(personal_data_candidates[0].value, u"Grande")
 
 
+    def test_it_does_not_create_replicate_answers(self):
+        Election.fetch_all_from_api()
+        UpdatingDataCandidator.install_candidator_yaml(yaml_file='candidator_example_data_updating')
+        election = Election.objects.all()[0]
+        election.update()
+        questions = Question.objects.filter(category__election=election)
+
+        #THERE ARE QUESTIONS ADDED BY DEFAULT TO CANDIDEIT.ORG
+        #I HAVE TO FIX THIS IN ORDER TO COUNT
+        #4 QUESTIONS AND
+        #10 ANSWERS
+        self.assertEquals(questions.count(), 6)
+        answers = Answer.objects.filter(question__in=questions)
+
+        self.assertEquals(answers.count(), 14)
+
+
+        candidates = Candidate.objects.filter(election=election)
+        self.assertEquals(candidates.count(), 3)
+
 
 
 
