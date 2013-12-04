@@ -267,7 +267,7 @@ class Background(CandideitorgDocument):
     background_category = models.ForeignKey(BackgroundCategory)
 
 class Answer(CandideitorgDocument):
-    caption = models.CharField(max_length=255)
+    caption = models.CharField(max_length=2048)
     question = models.ForeignKey('Question')
     # candidate = models.ForeignKey(Candidate)
 
