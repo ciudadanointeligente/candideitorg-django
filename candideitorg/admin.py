@@ -24,7 +24,7 @@ admin.site.register(CanElection, CanElectionAdmin)
 class BackgroundCandidateInline(admin.TabularInline):
     model = BackgroundCandidate
     fields = ['background', 'value']
-    extra = 1
+    extra = 0
 
 class CandidateAdmin(admin.ModelAdmin):
     fields = ['name', 'photo','has_answered',]

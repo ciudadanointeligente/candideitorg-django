@@ -29,3 +29,12 @@ CELERY_ALWAYS_EAGER = True
 BROKER_URL = 'amqp://guest:guest@localhost:5672/'
 CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
 CELERY_RESULT_BACKEND = "amqp"
+SECRET_KEY="hola"
+CANDIDEITORG_URL = 'http://127.0.0.1:3002/api/v2/'
+CANDIDEITORG_USERNAME = 'admin'
+CANDIDEITORG_API_KEY = 'a'
+
+import djcelery
+djcelery.setup_loader()
+
+CELERY_ALWAYS_EAGER = True
