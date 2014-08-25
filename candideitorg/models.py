@@ -311,7 +311,7 @@ class InformationSource(CandideitorgDocument):
 
         }
 class PersonalDataCandidate(CandideitorgDocument):
-    value = models.CharField(max_length=255, null=True)
+    value = models.TextField(null=True, blank=True)
     candidate = models.ForeignKey(Candidate)
     personaldata = models.ForeignKey(PersonalData)
 
