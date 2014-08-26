@@ -243,7 +243,7 @@ class Category(CandideitorgDocument):
         }
 
 class Candidate(CandideitorgDocument):
-    photo = models.CharField(max_length=255, null=True, blank=True)
+    photo = models.CharField(max_length=500, null=True, blank=True)
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255)
     has_answered = models.BooleanField()
