@@ -250,6 +250,20 @@ class Candidate(CandideitorgDocument):
     election = models.ForeignKey(Election)
     answers = models.ManyToManyField('Answer', null=True, blank=True)
 
+    def update(self):
+        candidate_dictionary = CandideitorgDocument.get_resource_as_dict(self.resource_uri)
+        PersonalDataCandidate.objects.filter(candidate=self).delete()
+        for uri in candidate_dictionary['personal_data_candidate']:
+
+            pdc_dictionary = CandideitorgDocument.get_resource_as_dict(uri)
+            try:
+                personaldata = PersonalData.objects.get(resource_uri=pdc_dictionary["personal_data"])
+                PersonalDataCandidate.create_new_from_dict(pdc_dictionary, 
+                                                        candidate=self, 
+                                                        personaldata=personaldata)
+            except:
+                pass
+
     def __unicode__(self):
         return self.name
 
