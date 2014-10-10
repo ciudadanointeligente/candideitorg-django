@@ -31,6 +31,12 @@ class CandidateAdmin(admin.ModelAdmin):
     inlines = [
         BackgroundCandidateInline
     ]
+    actions = ['update_candidate_from_candideit']
+    def update_candidate_from_candideit(self, request, queryset):
+        for candidate in queryset:
+            candidate.update()
+
+    update_candidate_from_candideit.short_description = "Update this candidate from candideitorg tryit one at the time"
 
 admin.site.register(Candidate, CandidateAdmin)
 
