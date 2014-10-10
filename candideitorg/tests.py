@@ -1178,6 +1178,19 @@ class ManagementCommandTestCase(CandideitorgTestCase):
         call_command('update_from_candidator')
         self.assertEquals(Election.objects.count(), 1)
 
+    def test_call_command_update_single_person(self):
+        UpdatingDataCandidator.install_candidator_yaml()
+        Election.fetch_all_from_api()
+        election = Election.objects.all()[0]
+        candidate = election.candidate_set.get(name="Juanito Perez")
+
+        UpdatingDataCandidator.install_candidator_yaml(yaml_file='candidator_example_data_with_answers2')
+
+        personaldata = election.personaldata_set.get(label=u'Profesion')
+        call_command('update_candidate_from_candidator', candidate.id)
+        personal_data_candidate = personaldata.personaldatacandidate_set.get(candidate=candidate)
+        self.assertEquals(personal_data_candidate.value, u"Grande")
+
 
 class ElectionFetchAllFromAPIPagination(CandideitorgTestCase):
     @classmethod
