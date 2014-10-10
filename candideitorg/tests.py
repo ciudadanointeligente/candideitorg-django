@@ -167,6 +167,23 @@ class UpdatingDataCandidator(CandideitorgTestCase):
         self.assertEquals(personal_data_candidates.count(), 1)
 
 
+    def test_update_single_person(self):
+        UpdatingDataCandidator.install_candidator_yaml()
+        Election.fetch_all_from_api()
+
+        UpdatingDataCandidator.install_candidator_yaml(yaml_file='candidator_example_data_with_answers')
+
+        election = Election.objects.all()[0]
+        candidate = election.candidate_set.get(name="Juanito Perez")
+
+        UpdatingDataCandidator.install_candidator_yaml(yaml_file='candidator_example_data_with_answers2')
+
+        personaldata = election.personaldata_set.get(label=u'Profesion')
+        
+        personal_data_candidates = personaldata.personaldatacandidate_set.filter(candidate=candidate)
+        candidate.update()
+        personal_data_candidate_again = personaldata.personaldatacandidate_set.get(candidate=candidate)
+        self.assertEquals(personal_data_candidate_again.value, u"Grande")
 
 
     def test_election_update_answers(self):
