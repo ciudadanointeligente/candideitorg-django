@@ -3,7 +3,7 @@ from django.core.management.base import BaseCommand, CommandError
 from candideitorg.models import Candidate
 
 class Command(BaseCommand):
-    args = 'Candidate id'
+    args = 'Candidate id in votainteligente'
 
     def handle(self, *args, **options):
         candidate_id = args[0]
