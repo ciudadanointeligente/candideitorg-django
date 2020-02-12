@@ -1,4 +1,4 @@
-Django==1.5.1
+Django==1.11.28
 slumber
 celery
 django-celery
